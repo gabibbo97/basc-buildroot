@@ -84,6 +84,8 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
+- Filesystem images ->
+  - [ ] tar the root filesystem
 - Save
 - Run `make toolchain` and go grab a coffee
 - Version `2020.08` will build you a `GCC 9.3` custom toolchain
@@ -101,6 +103,23 @@ Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc ../hello_arm.c 
 ```sh
 > file ../hello-arm
 ../hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
+```
+
+To package the compiler:
+
+- `make sdk`
+- You'll find the package inside `output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz`
+
+To use it:
+
+- Extract it somewhere
+- Open the folder inside a terminal
+- Run `relocate-sdk.sh` with `./relocate-sdk.sh`
+- Run these commands:
+
+```sh
+export PATH="${PATH}:${PWD}/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 ```
 
 ## Creating our own ARM buildroot
