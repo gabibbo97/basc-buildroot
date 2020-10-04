@@ -79,6 +79,8 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
   - Target Architecture = ARM (little endian)
   - Target Architecture Variant = cortex-A9
   - [x] Enable VFP extension support
+- Build options ->
+  - [x] Enable compiler cache
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
@@ -130,6 +132,8 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
   - Target Architecture = ARM (little endian)
   - Target Architecture Variant = cortex-A9
   - [x] Enable VFP extension support
+- Build options ->
+  - [x] Enable compiler cache
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
@@ -187,32 +191,65 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 ## Creating a bootable ARM image for binary analysis
 
 - Cleanup the environment with `make clean`
+- Run `make qemu_arm_vexpress_defconfig`
 - Run `make menuconfig`
-- Target options ->
-  - Target Architecture = ARM (little endian)
-  - Target Architecture Variant = cortex-A9
-  - [x] Enable VFP extension support
+- Build options ->
+  - [x] Enable compiler cache
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
-  - [x] Build cross gdb for the host
-  - [x] TUI support
 - System configuration ->
+  - System hostname = BASC2020
+  - System banner = Welcome to BASC2020 buildroot
   - Root password = BASC2020
-- Kernel ->
-  - [x] Linux Kernel ->
-    - Kernel configuration = Use the architecture default configuration
 - Target packages ->
-  - Crypto ->
-    - openssl support
-- Filesystem images ->
-  - [x] ext2/3/4 root filesystem
-  - [ ] tar the root filesystem
-- Bootloaders ->
-  - [x] grub2
+  - Debugging, profiling and benchmark ->
+    - [x] gdb
+    - [x] full debugger
+    - [x] gdbserver
+    - [x] TUI support
+    - [x] ltrace
+    - [x] strace
+  - Networking applications ->
+    - [x] openssh
+    - [ ] client
+    - [ ] key utilities
 - Save
 - Run `make source` to download sources
 - Run `make` and go grab a coffee
+
+Run the image with `./output/images/start-qemu.sh`
+
+Recommended alternative script
+
+```sh
+output/host/bin/qemu-system-arm \
+  -M vexpress-a9 \
+  -smp 2 -m 512 \
+  -kernel output/images/zImage \
+  -dtb output/images/vexpress-v2p-ca9.dtb \
+  -drive file=output/images/rootfs.ext2,if=sd,format=raw \
+  -append "console=ttyAMA0,115200 rootwait root=/dev/mmcblk0" \
+  -net nic,model=lan9118,netdev=nic \
+  -netdev user,id=nic,hostfwd=tcp::2222-:22,hostfwd=tcp::1234-:1234 \
+  -serial stdio
+```
+
+```sh
+mkdir -p guest-os
+sshfs root@localhost:/ ./guest-os \
+  -f \
+  -o port=2222 \
+  -o reconnect \
+  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+```
+
+```sh
+ssh \
+  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+  -p 2222 \
+  root@localhost
+```
 
 ## Customizing our images
 
