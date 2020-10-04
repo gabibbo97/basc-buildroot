@@ -124,7 +124,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 
 ## Creating our own ARM buildroot
 
-- Cleanup the environment with `make distclean`
+- Cleanup the environment with `make clean`
 - Run `make menuconfig`
 - Target options ->
   - Target Architecture = ARM (little endian)
@@ -184,9 +184,9 @@ cp -f "$(which qemu-arm-static)" basc-rootfs/bin/qemu-arm-static
 sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 ```
 
-## Creating a bootable ARM image
+## Creating a bootable ARM image for binary analysis
 
-<!-- - Cleanup the environment with `make distclean`
+- Cleanup the environment with `make clean`
 - Run `make menuconfig`
 - Target options ->
   - Target Architecture = ARM (little endian)
@@ -212,7 +212,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - [x] grub2
 - Save
 - Run `make source` to download sources
-- Run `make` and go grab a coffee -->
+- Run `make` and go grab a coffee
 
 ## Customizing our images
 
