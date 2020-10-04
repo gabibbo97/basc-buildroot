@@ -206,7 +206,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - Crypto ->
     - openssl support
 - Filesystem images ->
-  - [x] btrfs root filesystem
+  - [x] ext2/3/4 root filesystem
   - [ ] tar the root filesystem
 - Bootloaders ->
   - [x] grub2
