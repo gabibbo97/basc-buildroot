@@ -73,12 +73,13 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
 
 ## Creating our own ARM cross-compiler
 
-- Cleanup the environment with `make distclean`
+- Cleanup the environment with `make clean`
+- Run `make defconfig`
 - Run `make menuconfig`
 - Target options ->
   - Target Architecture = ARM (little endian)
-  - Target Architecture Variant = cortex-A9
-  - [x] Enable VFP extension support
+  - Target Architecture Variant = cortex-A7
+  - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
 - Toolchain ->
@@ -90,7 +91,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
   - [ ] tar the root filesystem
 - Save
 - Run `make toolchain` and go grab a coffee
-- Version `2020.08` will build you a `GCC 9.3` custom toolchain
+- Version `2020.08` will by default build you a `GCC 9.3` custom toolchain
 - You will find gcc at `output/host/bin/arm-buildroot-linux-gnueabihf-gcc`
 
 To setup the current shell to use the newly built cross compiler:
@@ -127,11 +128,12 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 ## Creating our own ARM buildroot
 
 - Cleanup the environment with `make clean`
+- Run `make defconfig`
 - Run `make menuconfig`
 - Target options ->
   - Target Architecture = ARM (little endian)
-  - Target Architecture Variant = cortex-A9
-  - [x] Enable VFP extension support
+  - Target Architecture Variant = cortex-A7
+  - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
 - Toolchain ->
@@ -139,11 +141,6 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
-- Build options ->
-  - [x] build packages with debugging symbols
-  - gcc debug level = debug level 3
-  - [ ] strip taget binaries
-  - gcc optimization level = optimization level 0
 - Target packages ->
   - Debugging, profiling and benchmark ->
     - [x] gdb
@@ -156,8 +153,6 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 - Run `make source` to download sources
 - Run `make` and go grab a coffee
 - You will our rootfs in `output/images/rootfs.tar`
-
-
 
 ### Usage of the rootfs
 
@@ -182,7 +177,10 @@ sudo docker run --rm -it \
 mkdir -p basc-rootfs
 tar -xf output/images/rootfs.tar -C basc-rootfs
 # If you have binfmt_misc support enabled
-sudo systemd-nspawn --register=no -D basc-rootfs /bin/sh
+sudo systemd-nspawn \
+  --private-users=pick \
+  --register=no \
+  -D basc-rootfs /bin/sh
 # If you don't have binfmt_misc support enabled
 cp -f "$(which qemu-arm-static)" basc-rootfs/bin/qemu-arm-static
 sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
@@ -191,8 +189,12 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 ## Creating a bootable ARM image for binary analysis
 
 - Cleanup the environment with `make clean`
-- Run `make qemu_arm_vexpress_defconfig`
+- Run `cp ../configs/virtio.kconfig ./virtio.kconfig`
 - Run `make menuconfig`
+- Target options ->
+  - Target Architecture = ARM (little endian)
+  - Target Architecture Variant = cortex-A7
+  - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
 - Toolchain ->
@@ -200,8 +202,13 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - [x] Enable C++ support
 - System configuration ->
   - System hostname = BASC2020
-  - System banner = Welcome to BASC2020 buildroot
+  - System banner = Welcome to BASC2020 Buildroot
   - Root password = BASC2020
+  - Network interface to configure through DHCP = eth0
+- Kernel ->
+  - [x] Linux Kernel ->
+    - Kernel configuration = Use the architecture default configuration
+    - Additional configuration fragment files = virtio.kconfig
 - Target packages ->
   - Debugging, profiling and benchmark ->
     - [x] gdb
@@ -210,39 +217,47 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
     - [x] TUI support
     - [x] ltrace
     - [x] strace
+    - [x] valgrind
   - Networking applications ->
     - [x] openssh
     - [ ] client
     - [ ] key utilities
+- Filesystem images ->
+  - [x] ext2/3/4 root filesystem
+    - exact size = 128M
+  - [ ] tar the root filesystem
 - Save
 - Run `make source` to download sources
 - Run `make` and go grab a coffee
 
-Run the image with `./output/images/start-qemu.sh`
-
-Recommended alternative script
-
 ```sh
-output/host/bin/qemu-system-arm \
-  -M vexpress-a9 \
-  -smp 2 -m 512 \
+qemu-system-arm \
+  -machine virt \
+  -cpu cortex-a7 \
+  -smp 4 -m 4096 \
   -kernel output/images/zImage \
-  -dtb output/images/vexpress-v2p-ca9.dtb \
-  -drive file=output/images/rootfs.ext2,if=sd,format=raw \
-  -append "console=ttyAMA0,115200 rootwait root=/dev/mmcblk0" \
-  -net nic,model=lan9118,netdev=nic \
-  -netdev user,id=nic,hostfwd=tcp::2222-:22,hostfwd=tcp::1234-:1234 \
-  -serial stdio
+  -device virtio-blk-device,drive=rootfs \
+  -drive file=output/images/rootfs.ext2,if=none,format=raw,id=rootfs \
+  -append "console=ttyAMA0,115200 rootwait root=/dev/vda" \
+  -netdev user,id=user0,hostfwd=tcp::2222-:22,hostfwd=tcp::1234-:1234 \
+  -device virtio-net-device,netdev=user0 \
+  -serial stdio \
+  -display none
 ```
 
+
+To share the target filesystem:
+
 ```sh
-mkdir -p guest-os
-sshfs root@localhost:/ ./guest-os \
+mkdir -p guest-os-ssh
+sshfs root@localhost:/ ./guest-os-ssh \
   -f \
   -o port=2222 \
   -o reconnect \
   -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 ```
+
+To SSH inside:
 
 ```sh
 ssh \
