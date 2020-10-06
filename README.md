@@ -55,6 +55,21 @@ Why buildroot:
 - x86_64
 - Xtensa
 
+## Prerequisites
+
+### Ubuntu 20.04
+
+```sh
+sudo apt-get update
+sudo apt-get install -y \
+  curl tar \
+  make \
+  gcc g++ \
+  libncurses-dev libssl-dev \
+  qemu-user-static \
+  qemu-system-arm
+```
+
 ## Obtaining
 
 ```sh
@@ -90,6 +105,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
 - Filesystem images ->
   - [ ] tar the root filesystem
 - Save
+- Run `make source`
 - Run `make toolchain` and go grab a coffee
 - Version `2020.08` will by default build you a `GCC 9.3` custom toolchain
 - You will find gcc at `output/host/bin/arm-buildroot-linux-gnueabihf-gcc`
