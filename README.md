@@ -102,6 +102,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
+  - Python support = Python3
 - Filesystem images ->
   - [ ] tar the root filesystem
 - Save
@@ -157,6 +158,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
+  - Python support = Python3
 - Target packages ->
   - Debugging, profiling and benchmark ->
     - [x] gdb
@@ -180,7 +182,7 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 sudo docker import output/images/rootfs.tar basc-buildroot
 sudo docker run --rm -it \
   --volume "$(which qemu-arm-static):/bin/qemu-arm-static" \
-  --volume "../:/host" \
+  --volume "${PWD}/:/host" \
   --entrypoint /bin/qemu-arm-static \
   --workdir "/host" \
   basc-buildroot \
@@ -216,6 +218,9 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
+  - [x] Build cross gdb for the host
+  - [x] TUI support
+  - Python support = Python3
 - System configuration ->
   - System hostname = BASC2020
   - System banner = Welcome to BASC2020 Buildroot
@@ -237,7 +242,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - Networking applications ->
     - [x] openssh
     - [ ] client
-    - [ ] key utilities
+    - [x] key utilities
 - Filesystem images ->
   - [x] ext2/3/4 root filesystem
     - exact size = 128M
