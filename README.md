@@ -97,43 +97,31 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
   - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
+  - [x] build packages with debugging symbols
+    - gcc debug level = debug level 3
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
   - Python support = Python3
+- System configuration ->
+  - Custom scripts to run before creating filesystem images = ./gef-python.sh
 - Filesystem images ->
   - [ ] tar the root filesystem
+- Host utilities ->
+  - host python3
+  - ssl
 - Save
 - Run `make source`
-- Run `make toolchain` and go grab a coffee
+- Run `make sdk` and go grab a coffee
 - Version `2020.08` will by default build you a `GCC 9.3` custom toolchain
-- You will find gcc at `output/host/bin/arm-buildroot-linux-gnueabihf-gcc`
-
-To setup the current shell to use the newly built cross compiler:
-
-```sh
-export PATH="${PATH}:${PWD}/output/host/bin"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/output/host/lib"
-```
-
-Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc ../hello_arm.c -o hello-arm`
-
-```sh
-> file ../hello-arm
-../hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
-```
-
-To package the compiler:
-
-- `make sdk`
 - You'll find the package inside `output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz`
 
 To use it:
 
 - Extract it somewhere
-- Open the folder inside a terminal
+- Open the folder you extracted inside a terminal
 - Run `relocate-sdk.sh` with `./relocate-sdk.sh`
 - Run these commands:
 
@@ -142,9 +130,19 @@ export PATH="${PATH}:${PWD}/bin"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 ```
 
+To setup the current shell to use the newly built cross compiler:
+
+Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc ../hello_arm.c -o hello-arm`
+
+```sh
+> file ../hello-arm
+../hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
+```
+
 ## Creating our own ARM buildroot
 
 - Cleanup the environment with `make clean`
+- Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
 - Target options ->
@@ -153,12 +151,16 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
   - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
+  - [x] build packages with debugging symbols
+    - gcc debug level = debug level 3
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
   - [x] Build cross gdb for the host
   - [x] TUI support
   - Python support = Python3
+- System configuration ->
+  - Custom scripts to run before creating filesystem images = ./gef-python.sh
 - Target packages ->
   - Debugging, profiling and benchmark ->
     - [x] gdb
@@ -167,6 +169,9 @@ export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
     - [x] TUI support
 - Filesystem images ->
   - [x] tar the root filesystem
+- Host utilities ->
+  - host python3
+  - ssl
 - Save
 - Run `make source` to download sources
 - Run `make` and go grab a coffee
@@ -208,6 +213,8 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 
 - Cleanup the environment with `make clean`
 - Run `cp ../configs/virtio.kconfig ./virtio.kconfig`
+- Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
+- Run `make defconfig`
 - Run `make menuconfig`
 - Target options ->
   - Target Architecture = ARM (little endian)
@@ -215,6 +222,8 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - Floating point strategy = VFPv4-D16
 - Build options ->
   - [x] Enable compiler cache
+  - [x] build packages with debugging symbols
+    - gcc debug level = debug level 3
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
@@ -226,6 +235,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - System banner = Welcome to BASC2020 Buildroot
   - Root password = BASC2020
   - Network interface to configure through DHCP = eth0
+  - Custom scripts to run before creating filesystem images = ./gef-python.sh
 - Kernel ->
   - [x] Linux Kernel ->
     - Kernel configuration = Use the architecture default configuration
@@ -247,6 +257,9 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - [x] ext2/3/4 root filesystem
     - exact size = 128M
   - [ ] tar the root filesystem
+- Host utilities ->
+  - host python3
+  - ssl
 - Save
 - Run `make source` to download sources
 - Run `make` and go grab a coffee
@@ -291,6 +304,8 @@ ssh \
 
 ### At build time
 
+#### Overlay
+
 - Create a directory `my-overlay`
 - Add inside `.config`
 
@@ -301,6 +316,28 @@ BR2_ROOTFS_OVERLAY=my-overlay
 - Insert the files inside `my-overlay`
 - Rebuild using `make`
 - The rootfs will contain also the overlay
+
+_Multiple overlays can be specified by separating them with spaces_
+
+#### Build script
+
+- Add inside `.config`
+
+```sh
+BR2_ROOTFS_POST_BUILD_SCRIPT=my-script.sh
+```
+
+Create `my-script.sh` with arbitrary commands, inside the script there are some variables that can be used:
+
+- `BR2_CONFIG` path of `.config`
+- `HOST_DIR` path to `output/host`
+- `STAGING_DIR` path to `output/staging`
+- `TARGET_DIR` path to `output/target`
+- `BUILD_DIR` path to `output/build`
+- `BINARIES_DIR` path to `output/images`
+- `BASE_DIR` path to `output`
+
+_Multiple scripts can be specified by separating them with spaces_
 
 ### After build
 
