@@ -1,6 +1,7 @@
 # Buildroot notes for BASC seminar
 
-[Presentation link](presentation/pres.pdf)
+- [Presentation link](presentation/pres.pdf)
+- [Annotated presentation link](presentation/pres-ann.pdf)
 
 ## About buildroot
 
@@ -282,6 +283,14 @@ qemu-system-arm \
   -display none
 ```
 
+To SSH inside:
+
+```sh
+ssh \
+  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+  -p 2222 \
+  root@localhost
+```
 
 To share the target filesystem:
 
@@ -292,15 +301,6 @@ sshfs root@localhost:/ ./guest-os-ssh \
   -o port=2222 \
   -o reconnect \
   -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-```
-
-To SSH inside:
-
-```sh
-ssh \
-  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
-  -p 2222 \
-  root@localhost
 ```
 
 ## Customizing our images

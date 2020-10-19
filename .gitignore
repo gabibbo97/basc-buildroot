@@ -4,3 +4,4 @@ buildroot-*.tar.gz
 presentation/*
 !presentation/pres.tex
 !presentation/pres.pdf
+!presentation/pres-ann.pdf
