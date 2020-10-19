@@ -6,8 +6,8 @@ PYTHON_BINARY="${HOST_DIR}/bin/python3"
 PIP_BINARY="${HOST_DIR}/bin/pip3"
 # Check python
 if ! [ -x "${PYTHON_BINARY}" ]; then
-  echo 'Python3 not found'
-  exit 0
+  echo 'Python3 not found' > /dev/stderr
+  exit 1
 fi
 # Install pip
 if ! [ -x "${PIP_BINARY}" ]; then
@@ -17,7 +17,7 @@ if ! [ -x "${PIP_BINARY}" ]; then
     elif [ -x "$(command -v wget)" ]; then
       wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
     else
-      echo 'Install curl or wget'
+      echo 'Install curl or wget' > /dev/stderr && exit 1
     fi
   }
   downloadGetPIP
