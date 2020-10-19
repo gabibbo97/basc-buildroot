@@ -17,7 +17,7 @@ make defconfig
 cd "$OLD_DIR"
 # Copy the files
 cp -f ./defconfigs/arm-cross-compiler "$BR_DIR"/.config
-cp -f ./scripts/gef-python.sh "$BR_DIR"
+cp -f ./scripts/gef-python.sh "$BR_DIR" && chmod +x "$BR_DIR"/gef-python.sh
 # Download sources and build
 cd "$BR_DIR"
 make olddefconfig
