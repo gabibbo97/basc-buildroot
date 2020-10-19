@@ -75,7 +75,7 @@ sudo apt-get install -y \
 ## Obtaining
 
 ```sh
-curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
+curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
 ```
 
 ## Commands
@@ -117,7 +117,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.tar.gz | tar -xzf -
 - Save
 - Run `make source`
 - Run `make sdk` and go grab a coffee
-- Version `2020.08` will by default build you a `GCC 9.3` custom toolchain
+- Version `2020.08.1` will by default build you a `GCC 9.3` custom toolchain
 - You'll find the package inside `output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz`
 
 To use it:
@@ -201,12 +201,6 @@ sudo docker run --rm -it \
 ```sh
 mkdir -p basc-rootfs
 tar -xf output/images/rootfs.tar -C basc-rootfs
-# If you have binfmt_misc support enabled
-sudo systemd-nspawn \
-  --private-users=pick \
-  --register=no \
-  -D basc-rootfs /bin/sh
-# If you don't have binfmt_misc support enabled
 cp -f "$(which qemu-arm-static)" basc-rootfs/bin/qemu-arm-static
 sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 ```
@@ -214,7 +208,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 ## Creating a bootable ARM image for binary analysis
 
 - Cleanup the environment with `make clean`
-- Run `cp ../configs/virtio.kconfig ./virtio.kconfig`
+- Run `cp ../kconfigs/virtio.kconfig ./virtio.kconfig`
 - Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
