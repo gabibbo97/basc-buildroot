@@ -1,5 +1,7 @@
 # Buildroot notes for BASC seminar
 
+[Presentation link](presentation/pres.pdf)
+
 ## About buildroot
 
 Buildroot is a set of [Makefile](https://en.wikipedia.org/wiki/Make_(software)) + [KConfig](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html) scripts that tries to create an easy way for creating root images.
@@ -10,19 +12,6 @@ The main consumers of buildroot are enterprises creating Linux based embedded sy
 - Automated factory control
 - Point of sale devices
 - Car media units
-
-The basic flow that buildroot supports is:
-
-- Creating a configuration file
-- Starting the build
-- Directly flashing the built image on devices
-
-Beyond the curtain what buildroot does for us is:
-
-- Building a cross compiler (so we can use our powerful build machine)
-- Resolving dependencies
-- Compiling from source for our target platform the packages
-- Assembling an image
 
 Why buildroot:
 
@@ -54,6 +43,19 @@ Why buildroot:
 - SPARC
 - x86_64
 - Xtensa
+
+The basic flow that buildroot supports is:
+
+- Creating a configuration file
+- Starting the build
+- Directly flashing the built image on devices
+
+Beyond the curtain what buildroot does for us is:
+
+- Building a cross compiler (so we can use our powerful build machine)
+- Resolving dependencies
+- Compiling from source for our target platform the packages
+- Assembling an image
 
 ## Prerequisites
 

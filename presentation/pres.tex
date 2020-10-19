@@ -1,0 +1,316 @@
+%
+% Configuration
+%
+%% Presentation
+\documentclass{beamer}
+\usecolortheme{beaver} % Silver + Red
+%% Encoding
+\usepackage[utf8]{inputenc}
+%% Symbols
+\usepackage{amsmath}
+%% Hyperlinks
+\usepackage{hyperref} % To use \href and \link
+\hypersetup{
+  colorlinks=true, % Links will be colored
+  urlcolor=darkred % Link color will be a darkish shade of red
+}
+%% Multiple columns
+\usepackage{multicol}
+%
+% Presentation data
+%
+%% Beamer
+\title{Buildroot}
+\subtitle{BASC2020 seminar}
+\author{Giacomo Longo}
+\institute{University of Genoa}
+\date{TODO}
+%% Mine
+\newcommand{\buildrootLatestVersion}{2020.08.1}
+\newcommand{\buildrootLatestVersionAnnouncement}{http://lists.busybox.net/pipermail/buildroot/2020-October/294407.html}
+\newcommand{\buildrootLatestVersionDownloadLink}{https://buildroot.org/downloads/buildroot-\buildrootLatestVersion.tar.gz}
+%
+% Document
+%
+%%
+%% Title para-section
+%%
+\begin{document}
+% Titlepage
+\begin{frame}
+  \titlepage
+\end{frame}
+% Table of contents
+\begin{frame}
+  \frametitle{Table of contents}
+  \tableofcontents
+\end{frame}
+%%
+%% Introduction section
+%%
+\section{BuildRoot}
+\subsection{What's BuildRoot}
+\begin{frame}
+  \frametitle{BuildRoot}
+  \begin{figure}
+    \begin{center}
+      \includegraphics[width=.5\textwidth]{logo-buildroot}
+    \end{center}
+  \end{figure}
+  \begin{center}
+    Official website: \url{https://buildroot.org}
+  \end{center}
+  \begin{itemize}
+    \item Born in 2005
+    \item Entirely based on \href{https://en.wikipedia.org/wiki/Make_(software)}{makefiles} and \href{https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html}{kconfig}
+    \item Only one goal: \textit{producing root file system images} for \textit{100\% custom Linux systems}
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{BuildRoot users}
+  The most prominent users of BuildRoot are using it for building:
+  \begin{itemize}
+    \item IoT devices
+    \item Automated factory controllers
+    \item Point of sale devices
+    \item Car multimedia units
+  \end{itemize}
+\end{frame}
+\subsection{Why BuildRoot}
+\begin{frame}
+  \frametitle{Why BuildRoot}
+  \begin{itemize}
+    \item Each buildroot is a 100\% custom Linux "mini-distro"
+    \item Buildroot images can be less than 100MB or even 10MB
+    \item Complete customization of target architecture and build flags
+    \item Multiple compiler / libc / system layout choices
+    \item Updated every 3 months {\small current version is \href{\buildrootLatestVersionAnnouncement}{\buildrootLatestVersion}}
+    \item Easily extendable
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Why BuildRoot: architecture support}
+  \begin{center}
+    $ \approx $ 20 architectures supported
+  \end{center}
+  \begin{multicols}{2}
+  \begin{itemize}
+    \item ARC {\small LE \& BE}
+    \item \textbf{ARM} {\small LE \& BE}
+    \item AArch64 {\small LE \& BE}
+    \item csky
+    \item \textbf{i386}
+    \item Microblaze {\small AXI \& Non-AXI}
+    \item MIPS {\small LE \& BE}
+    \item MIPS64 {\small LE \& BE}
+    \item nds32
+    \item Nios II
+    \item PowerPC
+    \item PowerPC64 {\small LE \& BE}
+    \item RISCV
+    \item SuperH
+    \item SPARC
+    \item \textbf{x86\_64}
+    \item Xtensa
+  \end{itemize}
+  \end{multicols}
+\end{frame}
+\subsection{BuildRoot process}
+\begin{frame}
+  \frametitle{The BuildRoot process}
+  \begin{columns}[t] % t == align the first line
+    \begin{column}{.5\textwidth}
+      \textbf{What the user sees}
+      \begin{enumerate}
+        \item Create a configuration file
+        \item Start the build
+        \item Flash the image on the device
+      \end{enumerate}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \textbf{What BuildRoot does}
+      \begin{enumerate}
+        \item Build a cross compiler on our machine
+        \item Resolve the configuration dependencies
+        \item Compile from source the requested packages
+        \item Assemble an image
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+\end{frame}
+%%
+%% Usage section
+%%
+\section{Creating some BuildRoots}
+\subsection{Prerequisites}
+\begin{frame}[fragile]
+  \frametitle{Prerequisites}
+  \framesubtitle{Packages for an ARM BuildRoot}
+  \begin{columns}[t]
+    \begin{column}{.5\textwidth}
+      \textbf{Ubuntu 20.04}
+      \begin{verbatim}
+sudo apt-get update
+sudo apt-get install -y \
+  curl tar \
+  make \
+  gcc g++ \
+  libncurses-dev libssl-dev \
+  qemu-user-static \
+  qemu-system-arm
+      \end{verbatim}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \textbf{Others} \\
+      {\small Binaries needed}
+      \begin{description}
+        \item[Downloaders] curl \& wget
+        \item[Extractor] tar
+        \item[Compilers] gcc \& g++
+        \item[Libraries] ncurses \& openssl
+        \item[Execution] QEMU system for ARM \& QEMU static 
+      \end{description}
+    \end{column}
+  \end{columns}
+\end{frame}
+\begin{frame}[fragile]
+  \frametitle{Obtaining BuildRoot}
+  \small
+  Download from: \\
+  \url{\buildrootLatestVersionDownloadLink} \\
+  Extract with \texttt{tar -xzf} \\
+  Your BuildRoot files will be in \texttt{buildroot-\buildrootLatestVersion}
+\end{frame}
+%%%%
+%%%% ARM cross compiler
+%%%%
+\subsection{Creating an ARM cross compiler}
+\begin{frame}
+  \frametitle{Creating an ARM cross compiler}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+%%%%
+%%%% ARM rootfs
+%%%%
+\subsection{Creating an ARM root filesystem}
+\begin{frame}
+  \frametitle{Creating an ARM root filesystem}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+%%%%
+%%%% ARM bootable rootfs
+%%%%
+\subsection{Creating a bootable ARM root filesystem}
+\begin{frame}
+  \frametitle{Creating a bootable ARM root filesystem}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\subsection{Customizing our images}
+\begin{frame}
+  \frametitle{Customizing our images}
+  \framesubtitle{Build time overlay}
+  \begin{itemize}
+    \item Create a directory
+    \item Add \texttt{BR2\_ROOTFS\_OVERLAY=my-overlay} to \texttt{.config}
+    \item Rebuild using \texttt{make}
+    \item The structure of \texttt{my-overlay} will be copied to the rootfs
+  \end{itemize}
+  \begin{block}{How to specify multiple overlays}
+    Multiple overlays can be specified by separating them with spaces in the \texttt{BR2\_ROOTFS\_OVERLAY} directive
+  \end{block}
+\end{frame}
+%%%%
+%%%% Customization
+%%%%
+\begin{frame}
+  \frametitle{Customizing our images}
+  \framesubtitle{Build time script}
+  Add \texttt{BR2\_ROOTFS\_POST\_BUILD\_SCRIPT=my-script.sh} to \texttt{.config} \\
+  Available environment variables inside:
+  \begin{table}
+    \begin{center}
+      \begin{tabular}{ll}
+        \texttt{BR2\_CONFIG} & path of \texttt{.config} \\
+        \texttt{HOST\_DIR} & path of \texttt{output/host} \\
+        \texttt{STAGING\_DIR} & path of \texttt{output/staging} \\
+        \texttt{TARGET\_DIR} & path of \texttt{output/target} \\
+        \texttt{BUILD\_DIR} & path of \texttt{output/build} \\
+        \texttt{BINARIES\_DIR} & path of \texttt{output/images} \\
+        \texttt{BASE\_DIR} & path of \texttt{output} \\
+      \end{tabular}
+    \end{center}
+  \end{table}
+  \begin{block}{How to specify multiple scripts}
+    Multiple scripts can be specified by separating them with spaces in the \texttt{BR2\_ROOTFS\_POST\_BUILD\_SCRIPT} directive
+  \end{block}
+\end{frame}
+\begin{frame}
+  \frametitle{Customizing our images}
+  \framesubtitle{Editing the target directory}
+  \begin{enumerate}
+    \item Add your files to the \texttt{output/target} directory
+    \item Rebuild using \texttt{make}
+  \end{enumerate}
+  \begin{alertblock}{Warning}
+    Your files might be rewritten / deleted by buildroot
+  \end{alertblock}
+\end{frame}
+\begin{frame}
+  \frametitle{Customizing our images}
+  \framesubtitle{D.I.Y. approach}
+  \begin{enumerate}
+    \item Unpack your rootfs (with \texttt{tar -xzf} for instance)
+    \item Perform your modifications
+    \item Repack your rootfs (with \texttt{tar -cf} for instance)
+  \end{enumerate}
+\end{frame}
+%%
+%% Using BuildRoot section
+%%
+\section{Using our BuildRoot}
+\subsection{Running dynamic executables}
+\begin{frame}
+  \frametitle{Running dynamic executables in Docker}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\begin{frame}
+  \frametitle{Running dynamic executables with systemd-nspawn}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\subsection{Performing dynamic analysis}
+\begin{frame}
+  \frametitle{Tips and tricks}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\begin{frame}
+  \frametitle{Using ltrace}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\begin{frame}
+  \frametitle{Using strace}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+\begin{frame}
+  \frametitle{Using gdb}
+  \begin{center}
+    TODO
+  \end{center}
+\end{frame}
+
+\end{document}
