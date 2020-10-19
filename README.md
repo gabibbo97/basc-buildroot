@@ -91,6 +91,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
 ## Creating our own ARM cross-compiler
 
 - Cleanup the environment with `make clean`
+- Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
 - Target options ->
@@ -101,6 +102,8 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
   - [x] Enable compiler cache
   - [x] build packages with debugging symbols
     - gcc debug level = debug level 3
+  - [ ] strip target binaries
+  - gcc optimization level = optimize for debugging
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
@@ -155,6 +158,8 @@ Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc ../hello_arm.c 
   - [x] Enable compiler cache
   - [x] build packages with debugging symbols
     - gcc debug level = debug level 3
+  - [ ] strip target binaries
+  - gcc optimization level = optimize for debugging
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
@@ -220,6 +225,8 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - [x] Enable compiler cache
   - [x] build packages with debugging symbols
     - gcc debug level = debug level 3
+  - [ ] strip target binaries
+  - gcc optimization level = optimize for debugging
 - Toolchain ->
   - C library = glibc
   - [x] Enable C++ support
