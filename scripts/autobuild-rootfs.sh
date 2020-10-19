@@ -12,7 +12,7 @@ fi
 # Cleanup dir
 echo 'Cleaning up BuildRoot directory'
 cd "$BR_DIR"
-make clean
+make clean || true
 make defconfig
 cd "$OLD_DIR"
 # Copy the files
