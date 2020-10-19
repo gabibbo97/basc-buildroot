@@ -1,7 +1,6 @@
 buildroot-*
 buildroot-*.tar.gz
-hello-arm
-sum-arm
+*-arm
 presentation/*
 !presentation/pres.tex
 !presentation/pres.pdf
