@@ -16,8 +16,12 @@ if [ "$1" = "package" ]; then
       [ -d "$dir" ] || continue
       # Package using tar
       tar -cf $(basename "$dir").tar "$dir"
-      xz -T0 -9 -e $(basename "$dir").tar
-      sha512sum $(basename "$dir").tar.xz $(basename "$dir").tar.xz.sha512sum
+      xz \
+        -T0 \
+        --arm \
+        --lzma2=dict=$(( 1024 * 1024 * 384 )),lc=4,pb=4,mf=bt4,mode=normal,nice=273,depth=4096 \
+        $(basename "$dir").tar
     done
+    sha512sum ./*.tar.xz checksums.sha512sum
   )
 fi

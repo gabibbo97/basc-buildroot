@@ -13,15 +13,15 @@ fi
 echo 'Cleaning up BuildRoot directory'
 cd "$BR_DIR"
 make clean || true
-make defconfig
+make defconfig || true
 cd "$OLD_DIR"
 # Copy the files
-cp -f ./defconfigs/arm-bootable-rootfs "$BR_DIR"/.config
-cp -f ./kconfigs/virtio.kconfig "$BR_DIR"/.config
+cp -f ./defconfigs/arm-bootable-rootfs "$BR_DIR"/configs/arm_bootable_rootfs_defconfig
+cp -f ./kconfigs/virtio.kconfig "$BR_DIR"/virtio.kconfig
 cp -f ./scripts/gef-python.sh "$BR_DIR" && chmod +x "$BR_DIR"/gef-python.sh
 # Download sources and build
 cd "$BR_DIR"
-make olddefconfig
+make arm_bootable_rootfs_defconfig
 make source
 make
 # Copy here the results
