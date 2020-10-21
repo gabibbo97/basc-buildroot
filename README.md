@@ -91,7 +91,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
 
 ## Creating our own ARM cross-compiler
 
-- Cleanup the environment with `make clean`
+- Cleanup the environment with `make distclean`
 - Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
@@ -144,7 +144,7 @@ hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically l
 
 ## Creating our own ARM buildroot
 
-- Cleanup the environment with `make clean`
+- Cleanup the environment with `make distclean`
 - Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
@@ -210,7 +210,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 
 ## Creating a bootable ARM image for binary analysis
 
-- Cleanup the environment with `make clean`
+- Cleanup the environment with `make distclean`
 - Run `cp ../kconfigs/virtio.kconfig ./virtio.kconfig`
 - Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
