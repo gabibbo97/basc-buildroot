@@ -12,7 +12,7 @@ fi
 # Cleanup dir
 echo 'Cleaning up BuildRoot directory'
 cd "$BR_DIR"
-make clean || true
+make distclean || true
 make defconfig || true
 cd "$OLD_DIR"
 # Copy the files
@@ -25,6 +25,7 @@ cd "$BR_DIR"
 make arm_bootable_rootfs_defconfig
 make source
 make
+make sdk
 # Copy here the results
 cd "$OLD_DIR"
 mkdir -p output/bootable-rootfs
