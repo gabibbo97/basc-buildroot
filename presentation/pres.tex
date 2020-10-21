@@ -9,7 +9,7 @@
 \setbeamersize{
   text margin left=5mm,
   text margin right=5mm
-} 
+}
 %% Draft
 \usepackage{draftwatermark}
 \SetWatermarkText{TODO}
@@ -185,7 +185,7 @@ sudo apt-get install -y \
         \item[Extractor] tar
         \item[Compilers] gcc \& g++
         \item[Libraries] ncurses \& openssl
-        \item[Execution] QEMU system for ARM \& QEMU static 
+        \item[Execution] QEMU system for ARM \& QEMU static
       \end{description}
     \end{column}
   \end{columns}
@@ -477,7 +477,7 @@ sudo apt-get install -y \
   Steps explaination
   \begin{enumerate}
     \item \enteringBuildRootDirectoryDescription
-    \item In order to use our built rootfs inside QEMU we need to add some Kernel modules, 
+    \item In order to use our built rootfs inside QEMU we need to add some Kernel modules,
       this file contains the kernel configuration options that should be set to support smooth virtualization under QEMU
     \item \gefPythonDescription
     \item \scriptShouldBeExecutableDescription
@@ -584,7 +584,7 @@ sudo apt-get install -y \
 %%%% Customization
 %%%%
 \subsection{Customizing our images}
-\begin{frame}
+\begin{frame}[label={Customizing our images}]
   \frametitle{Customizing our images}
   \framesubtitle{Build time overlay}
   \begin{itemize}
@@ -646,7 +646,20 @@ sudo apt-get install -y \
 \subsection{Producing binaries for the target}
 \begin{frame}
   \frametitle{Using the cross-compiler}
+  \begin{enumerate}
+    \item Extract the cross-compiler
+    \item Run \texttt{relocate-sdk.sh}
+    \item Edit your \texttt{ \$PATH } variable: \texttt{export PATH="\${PATH}:\${PWD}/bin"}
+    \item You can invoke your cross compiler with commands like \texttt{arm-buildroot-linux-gnueabihf-\textit{<COMMAND NAME>}} \\
+    \textbf{Notable entries}
+    \begin{itemize}
+      \item \texttt{arm-buildroot-linux-gnueabihf-gcc}
+      \item \texttt{arm-buildroot-linux-gnueabihf-gdb}
+      \item \texttt{arm-buildroot-linux-gnueabihf-nm}
+    \end{itemize}
+  \end{enumerate}
 \end{frame}
+
 \subsection{Running dynamic executables}
 \begin{frame}[fragile]
   \frametitle{Running dynamic executables in Docker}
@@ -694,15 +707,15 @@ sudo systemd-nspawn \
 \subsection{Performing dynamic analysis}
 \begin{frame}[fragile]
   \frametitle{Booting the rootfs}
-  \footnotesize 
+  \footnotesize
   \begin{verbatim}
 qemu-system-arm \
   -machine virt \
   -cpu cortex-a7 \
   -smp 4 -m 4096 \
-  -kernel output/images/zImage \
+  -kernel zImage \
   -device virtio-blk-device,drive=rootfs \
-  -drive file=output/images/rootfs.ext2,if=none,format=raw,id=rootfs \
+  -drive file=rootfs.ext2,if=none,format=raw,id=rootfs \
   -append "console=ttyAMA0,115200 rootwait root=/dev/vda" \
   -netdev user,id=user0,hostfwd=tcp::2222-:22,hostfwd=tcp::1234-:1234 \
   -device virtio-net-device,netdev=user0 \
@@ -735,7 +748,30 @@ qemu-system-arm \
 
 \begin{frame}[fragile]
   \frametitle{Tips and tricks}
-  
+  \framesubtitle{Enable SSH root login}
+
+  \textit{In your BuildRoot shell}
+  \begin{enumerate}
+    \item Edit \texttt{/etc/ssh/sshd\_config} to include \texttt{PermitRootLogin yes}
+    \item Find the \texttt{openssh} server process id number
+    \begin{verbatim}
+# ps | grep 'sshd'
+  138 root     sshd: /usr/sbin/sshd [listener] 0 of 10-100 startups
+  158 root     grep sshd
+    \end{verbatim}
+    \item Reload the \text{openssh} process
+    \begin{verbatim}
+# kill -s HUP 138
+    \end{verbatim}
+  \end{enumerate}
+  \begin{block}{Automating the process}
+    See the section on \hyperlink{important}{\beamergotobutton{Customizing our images}}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Tips and tricks}
+  \framesubtitle{Enable SSH root login}
   \begin{center}
     \textbf{Opening an SSH session}
   \end{center}
@@ -745,7 +781,7 @@ ssh \
   -o StrictHostKeyChecking=no \
   -p 2222 root@localhost
   \end{verbatim}
-  
+
   \begin{center}
     \textbf{Sharing a folder}
   \end{center}
@@ -758,25 +794,23 @@ sshfs root@localhost:/ ./guest-os-ssh \
   -o UserKnownHostsFile=/dev/null \
   -o StrictHostKeyChecking=no
   \end{verbatim}
-  
 \end{frame}
+
 \begin{frame}
-  \frametitle{Using ltrace}
-  \begin{center}
-    TODO
-  \end{center}
-\end{frame}
-\begin{frame}
-  \frametitle{Using strace}
-  \begin{center}
-    TODO
-  \end{center}
+  \frametitle{Using ltrace and strace}
+  \framesubtitle{What did you expect?}
+  \begin{itemize}
+    \item \texttt{ltrace} and \texttt{strace} do work as expected
+    \item Can only be performed on QEMU \textbf{system} emulation
+  \end{itemize}
 \end{frame}
 \begin{frame}
   \frametitle{Using gdb}
-  \begin{center}
-    TODO
-  \end{center}
+  \textbf{On the guest} \\
+  \texttt{gdbserver :1234} \textit{command to debug} \\
+  \textbf{On the host} \\
+  \texttt{(gdb) target remote localhost:1234} \\
+  \textit{remember to set the sysroot}
 \end{frame}
 
 \end{document}

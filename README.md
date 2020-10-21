@@ -133,16 +133,13 @@ To use it:
 
 ```sh
 export PATH="${PATH}:${PWD}/bin"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${PWD}/lib"
 ```
 
-To setup the current shell to use the newly built cross compiler:
-
-Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc ../hello_arm.c -o hello-arm`
+Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc hello_arm.c -o hello-arm`
 
 ```sh
-> file ../hello-arm
-../hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
+> file hello-arm
+hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
 ```
 
 ## Creating our own ARM buildroot
