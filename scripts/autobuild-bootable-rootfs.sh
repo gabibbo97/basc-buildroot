@@ -16,6 +16,7 @@ make clean || true
 make defconfig || true
 cd "$OLD_DIR"
 # Copy the files
+mkdir -p "$BR_DIR"/configs
 cp -f ./defconfigs/arm-bootable-rootfs "$BR_DIR"/configs/arm_bootable_rootfs_defconfig
 cp -f ./kconfigs/virtio.kconfig "$BR_DIR"/virtio.kconfig
 cp -f ./scripts/gef-python.sh "$BR_DIR" && chmod +x "$BR_DIR"/gef-python.sh
