@@ -21,13 +21,13 @@ cd "$OLD_DIR"
 mkdir -p "$BR_DIR"/configs
 cp -f ./defconfigs/arm-bootable-rootfs "$BR_DIR"/configs/arm_bootable_rootfs_defconfig
 cp -f ./kconfigs/virtio.kconfig "$BR_DIR"/virtio.kconfig
+cp -f ./scripts/enable-ssh-root-login.sh "$BR_DIR" && chmod +x "$BR_DIR"/enable-ssh-root-login.sh
 cp -f ./scripts/gef-python.sh "$BR_DIR" && chmod +x "$BR_DIR"/gef-python.sh
 # Download sources and build
 cd "$BR_DIR"
 make arm_bootable_rootfs_defconfig
 make source
 make
-make sdk
 # Copy here the results
 cd "$OLD_DIR"
 mkdir -p output/bootable-rootfs

@@ -26,7 +26,6 @@ cd "$BR_DIR"
 make arm_rootfs_defconfig
 make source
 make
-make sdk
 # Copy here the results
 cd "$OLD_DIR"
 mkdir -p output/rootfs

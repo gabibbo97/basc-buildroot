@@ -212,6 +212,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 
 - Cleanup the environment with `make distclean`
 - Run `cp ../kconfigs/virtio.kconfig ./virtio.kconfig`
+- Run `cp ../scripts/enable-ssh-root-login.sh ./enable-ssh-root-login.sh && chmod +x *.sh`
 - Run `cp ../scripts/gef-python.sh ./gef-python.sh && chmod +x *.sh`
 - Run `make defconfig`
 - Run `make menuconfig`
@@ -236,7 +237,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - System banner = Welcome to BASC2020 Buildroot
   - Root password = BASC2020
   - Network interface to configure through DHCP = eth0
-  - Custom scripts to run before creating filesystem images = ./gef-python.sh
+  - Custom scripts to run before creating filesystem images = ./enable-ssh-root-login.sh ./gef-python.sh
 - Kernel ->
   - [x] Linux Kernel ->
     - Kernel configuration = Use the architecture default configuration

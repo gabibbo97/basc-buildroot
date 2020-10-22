@@ -231,6 +231,10 @@ sudo apt-get install -y \
 \newcommand{\scriptShouldBeExecutableDescription}{
   The script will not be invoked by a shell, but as an executable, so we should ensure correct permissions
 }
+\newcommand{\sshRootLoginDescription}{
+  By default OpenSSH server does not allow access to the \texttt{root} user as a security feature. \\
+  In order to be able to simply login to our BuildRoot we need to disable this option.
+}
 \newcommand{\targetOptionsDescription}{
   \textbf{Target Options} define what target architecture and variant we are targeting. \\
   Our target architecture is ARM little-endian, a commonplace 32bit architecture used in mobile phones. \\
@@ -467,6 +471,7 @@ sudo apt-get install -y \
     \item \texttt{ cd buildroot-\buildrootLatestVersion }
     \item \texttt{ cp ../kconfigs/virtio.kconfig ./virtio.kconfig }
     \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
+    \item \texttt{ cp ../scripts/enable-ssh-root-login.sh ./enable-ssh-root-login.sh }
     \item \texttt{ chmod +x *.sh }
     \item \texttt{ make distclean }
     \item \texttt{ make defconfig }
@@ -480,6 +485,7 @@ sudo apt-get install -y \
     \item In order to use our built rootfs inside QEMU we need to add some Kernel modules,
       this file contains the kernel configuration options that should be set to support smooth virtualization under QEMU
     \item \gefPythonDescription
+    \item \sshRootLoginDescription
     \item \scriptShouldBeExecutableDescription
     \item \makeCleanDescription
     \item \makeDefConfigDescription
@@ -512,7 +518,7 @@ sudo apt-get install -y \
       \item System banner = Welcome to BASC2020 Buildroot
       \item Root password = BASC2020
       \item Network interface to configure through DHCP = eth0
-      \item Custom scripts to run before creating filesystem images = ./gef-python.sh
+      \item Custom scripts to run before creating filesystem images = ./enable-ssh-root-login.sh ./gef-python.sh
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -522,6 +528,7 @@ sudo apt-get install -y \
   The system customization of hostname / banner is simply aestetic. \\
   The root password has to be set in order to be able to login. \\
   We choose to automatically configure the first ethernet network interface in order to avoid bothering with networking settings after the rootfs will be booted in QEMU. \\
+  \sshRootLoginDescription \\
   \gefPythonDescription
 }
 
@@ -658,6 +665,9 @@ sudo apt-get install -y \
       \item \texttt{arm-buildroot-linux-gnueabihf-nm}
     \end{itemize}
   \end{enumerate}
+  \begin{alertblock}{Improving gdb with library simbols}
+    See the section \hyperlink{important}{\beamergotobutton{Using gdb}}
+  \end{alertblock}
 \end{frame}
 
 \subsection{Running dynamic executables}
@@ -746,32 +756,32 @@ qemu-system-arm \
   \end{description}
 }
 
+% \begin{frame}[fragile]
+%   \frametitle{Tips and tricks}
+%   \framesubtitle{Enable SSH root login}
+
+%   \textit{In your BuildRoot shell}
+%   \begin{enumerate}
+%     \item Edit \texttt{/etc/ssh/sshd\_config} to include \texttt{PermitRootLogin yes}
+%     \item Find the \texttt{openssh} server process id number
+%     \begin{verbatim}
+% # ps | grep 'sshd'
+%   138 root     sshd: /usr/sbin/sshd [listener] 0 of 10-100 startups
+%   158 root     grep sshd
+%     \end{verbatim}
+%     \item Reload the \text{openssh} process
+%     \begin{verbatim}
+% # kill -s HUP 138
+%     \end{verbatim}
+%   \end{enumerate}
+%   \begin{block}{Automating the process}
+%     See the section on \hyperlink{important}{\beamergotobutton{Customizing our images}}
+%   \end{block}
+% \end{frame}
+
 \begin{frame}[fragile]
   \frametitle{Tips and tricks}
-  \framesubtitle{Enable SSH root login}
-
-  \textit{In your BuildRoot shell}
-  \begin{enumerate}
-    \item Edit \texttt{/etc/ssh/sshd\_config} to include \texttt{PermitRootLogin yes}
-    \item Find the \texttt{openssh} server process id number
-    \begin{verbatim}
-# ps | grep 'sshd'
-  138 root     sshd: /usr/sbin/sshd [listener] 0 of 10-100 startups
-  158 root     grep sshd
-    \end{verbatim}
-    \item Reload the \text{openssh} process
-    \begin{verbatim}
-# kill -s HUP 138
-    \end{verbatim}
-  \end{enumerate}
-  \begin{block}{Automating the process}
-    See the section on \hyperlink{important}{\beamergotobutton{Customizing our images}}
-  \end{block}
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Tips and tricks}
-  \framesubtitle{Enable SSH root login}
+  \framesubtitle{Using SSH}
   \begin{center}
     \textbf{Opening an SSH session}
   \end{center}
@@ -807,10 +817,19 @@ sshfs root@localhost:/ ./guest-os-ssh \
 \begin{frame}
   \frametitle{Using gdb}
   \textbf{On the guest} \\
-  \texttt{gdbserver :1234} \textit{command to debug} \\
-  \textbf{On the host} \\
-  \texttt{(gdb) target remote localhost:1234} \\
-  \textit{remember to set the sysroot}
+  \texttt{gdbserver :1234 \textit{command to debug}} \\
+  \textbf{On the host} (\textit{From the cross-compiler extracted folder}) \\
+  \texttt{
+    \small
+    bin/{\tiny arm-buildroot-linux-gnueabihf-}gdb $\backslash$ \\
+      \quad -x {\tiny arm-buildroot-linux-gnueabihf}/sysroot/usr/share/buildroot/gdbinit $\backslash$ \\
+      \quad \textit{executable name}
+  }\\
+  \textbf{On the host gdb shell} attach with \texttt{target remote localhost:1234}
 \end{frame}
+\only<handout> {
+  The \texttt{-x} argument points gdb to an additional \texttt{gdbinit}. \\
+  The only command inside is \texttt{set sysroot} that will allow gdb to access libraries pertaining to the guest
+}
 
 \end{document}

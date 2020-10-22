@@ -29,3 +29,5 @@ eval "${PIP_BINARY}" install \
   keystone-engine \
   unicorn \
   ropper
+# Delete Python compiler cache
+find "$BASE_DIR" -name '*.pyc' -delete
