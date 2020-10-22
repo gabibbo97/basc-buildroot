@@ -7,7 +7,7 @@ set -e # Fail on error
 OLD_DIR="$(pwd)"
 BR_DIR=$(find . -maxdepth 1 -name 'buildroot-*' -type d | head -n 1)
 if [ -z "${BR_DIR}" ]; then
-  sh ./scripts/get-buildroot.sh
+  sh ./seminar-scripts/get-buildroot.sh
 fi
 # Cleanup dir
 echo 'Cleaning up BuildRoot directory'
