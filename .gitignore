@@ -3,6 +3,8 @@ buildroot-*
 buildroot-*.tar.gz
 *-arm
 presentation/*
+!presentation/content.tex
 !presentation/pres.tex
+!presentation/pres-ann.tex
 !presentation/pres.pdf
 !presentation/pres-ann.pdf
