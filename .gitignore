@@ -8,3 +8,4 @@ presentation/*
 !presentation/pres-ann.tex
 !presentation/pres.pdf
 !presentation/pres-ann.pdf
+!presentation/Makefile
