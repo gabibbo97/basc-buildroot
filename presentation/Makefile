@@ -4,11 +4,11 @@ PDFLATEX := pdflatex
 presentation: pres.pdf pres-ann.pdf
 # Single components
 .PHONY: pres.pdf
-pres.pdf: content.tex pres.tex
-	$(PDFLATEX) pres.tex
+pres.pdf: pres.tex content.tex
+	$(PDFLATEX) $<
 .PHONY: pres.pdf
-pres-ann.pdf: content.tex pres-ann.tex
-	$(PDFLATEX) pres-ann.tex
+pres-ann.pdf: pres-ann.tex content.tex
+	$(PDFLATEX) $<
 # Cleanup
 .PHONY: clean
 clean:
