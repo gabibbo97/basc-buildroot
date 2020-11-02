@@ -189,11 +189,10 @@ sudo apt-get install -y \
   \begin{enumerate}
     \item Clone the repository at \\ \mbox{ \url{\gitRepoUrl} }
     \item Enter the directory
-    \item Download BuildRoot from \\ \mbox{ \url{\buildrootLatestVersionDownloadLink} }
-    \item Extract the BuildRoot archive
+    \item Run \texttt{sh ./seminar-scripts/get-buildroot.sh}
   \end{enumerate}
-  \begin{alertblock}{To follow along}
-    Ensure you have extracted the BuildRoot archive to \texttt{buildroot-\buildrootLatestVersion}
+  \begin{alertblock}{Please use the provided script}
+    The script downloads BuildRoot \buildrootLatestVersion but also applies two required patches that we need for today's seminar
   \end{alertblock}
 \end{frame}
 %%%%
@@ -801,12 +800,13 @@ sshfs root@localhost:/ ./guest-os-ssh \
 \end{frame}
 
 \begin{frame}
-  \frametitle{Using ltrace and strace}
+  \frametitle{Using \{l,s,uf\}trace}
   \framesubtitle{What did you expect?}
   \begin{itemize}
-    \item \texttt{ltrace} and \texttt{strace} do work as expected
+    \item \{l,s,uf\}trace do work as expected
     \item Can only be performed on QEMU \textbf{system} emulation
   \end{itemize}
+  Note that \textit{ltrace} has a bug with unwinding of DWARF tables on ARM and will show limited information.
 \end{frame}
 \begin{frame}
   \frametitle{Using gdb}
