@@ -250,10 +250,10 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
     - [x] TUI support
     - [x] ltrace
     - [x] strace
+    - [x] uftrace
     - [x] valgrind
   - Networking applications ->
     - [x] openssh
-    - [ ] client
     - [x] key utilities
 - Filesystem images ->
   - [x] ext2/3/4 root filesystem

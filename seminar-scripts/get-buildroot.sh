@@ -18,3 +18,13 @@ elif [ -x "$(command -v wget)" ]; then
 else
   echo 'Install curl or wget' > /dev/stderr && exit 1
 fi
+#
+# Apply patches
+#
+## Check
+echo 'Checking patches'
+git apply --check --directory="buildroot-${BUILDROOT_VERSION}" --exclude="buildroot-${BUILDROOT_VERSION}/DEVELOPERS" ./patches/uftrace.patch
+## Apply
+echo 'Applying patches'
+git apply --directory="buildroot-${BUILDROOT_VERSION}" --exclude="buildroot-${BUILDROOT_VERSION}/DEVELOPERS" ./patches/uftrace.patch
+cp ./patches/ltrace-assertion-failed.patch "buildroot-${BUILDROOT_VERSION}"/package/ltrace
