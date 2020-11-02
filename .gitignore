@@ -9,3 +9,4 @@ presentation/*
 !presentation/pres.pdf
 !presentation/pres-ann.pdf
 !presentation/Makefile
+!presentation/*.png
