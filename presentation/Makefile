@@ -12,5 +12,4 @@ pres-ann.pdf: pres-ann.tex content.tex
 # Cleanup
 .PHONY: clean
 clean:
-	rm -f pres.pdf
-	rm -f pres-ann.pdf
+	rm -f ./*.pdf ./*.aux ./*.log ./*.nav ./*.out ./*.snm ./*.toc ./*.vrb

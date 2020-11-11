@@ -1,30 +1,29 @@
 #!/bin/sh
+if ! [ -x "$(command -v git)" ]; then
+  echo 'Install git' > /dev/stderr && exit 1
+fi
+if ! [ -x "$(command -v find)" ]; then
+  echo 'Install find' > /dev/stderr && exit 1
+fi
 #
 # Automatically downloads BuildRoot sources
 #
-BUILDROOT_VERSION='2020.08.1'
+BUILDROOT_VERSION='2020.11-rc1'
 if [ -d "buildroot-${BUILDROOT_VERSION}" ]; then
   echo 'BuildRoot already downloaded'
   exit 0
 fi
-
-DL_URL="https://buildroot.org/downloads/buildroot-${BUILDROOT_VERSION}.tar.gz"
-if [ -x "$(command -v curl)" ]; then
-  echo 'Downloading buildroot with curl'
-  curl -L "${DL_URL}" | tar -xzf -
-elif [ -x "$(command -v wget)" ]; then
-  echo 'Downloading buildroot with wget'
-  wget -O - "${DL_URL}" | tar -xzf -
-else
-  echo 'Install curl or wget' > /dev/stderr && exit 1
-fi
+git clone --depth=1 -b "${BUILDROOT_VERSION}" https://git.busybox.net/buildroot "buildroot-${BUILDROOT_VERSION}"
 #
 # Apply patches
 #
-## Check
-echo 'Checking patches'
-git apply --check --directory="buildroot-${BUILDROOT_VERSION}" --exclude="buildroot-${BUILDROOT_VERSION}/DEVELOPERS" ./patches/uftrace.patch
-## Apply
+echo 'Copying patches'
+
+find "./buildroot-${BUILDROOT_VERSION}/package/gdb" -mindepth 1 -maxdepth 1 -type d | while read -r gdbVerDir; do
+  MAXN=$(find "$gdbVerDir" -type f -name '*.patch' | sort | tail -n1 | xargs basename | cut -d- -f1)
+  DEST_FILENAME=$(printf '%04d' "$(( MAXN + 1 ))")-gdb-python39.patch
+  cp ./patches/gdb-python39.patch "${gdbVerDir}/${DEST_FILENAME}"
+done
+
 echo 'Applying patches'
-git apply --directory="buildroot-${BUILDROOT_VERSION}" --exclude="buildroot-${BUILDROOT_VERSION}/DEVELOPERS" ./patches/uftrace.patch
-cp ./patches/ltrace-assertion-failed.patch "buildroot-${BUILDROOT_VERSION}"/package/ltrace
+(cd "buildroot-${BUILDROOT_VERSION}" && git am ../patches/*uftrace*.patch)

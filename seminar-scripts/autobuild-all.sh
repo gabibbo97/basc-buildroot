@@ -11,3 +11,5 @@ sh ./seminar-scripts/autobuild-bootable-rootfs.sh
 for script in ./seminar-scripts/to-include-in-output/*; do
   cp -f "$script" ./output
 done
+# Package
+sh ./seminar-scripts/autobuild-package.sh

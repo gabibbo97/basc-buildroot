@@ -5,7 +5,7 @@
 exec qemu-system-arm \
   -machine virt \
   -cpu cortex-a7 \
-  -smp 4 -m 4096 \
+  -smp 2 -m 2000 \
   -kernel bootable-rootfs/zImage \
   -device virtio-blk-device,drive=rootfs \
   -drive file=bootable-rootfs/rootfs.ext2,if=none,format=raw,id=rootfs \

@@ -28,6 +28,8 @@ eval "${PIP_BINARY}" install \
   capstone \
   keystone-engine \
   unicorn \
-  ropper
+  ropper \
+  pwntools \
+  frida-tools
 # Delete Python compiler cache
 find "$BASE_DIR" -name '*.pyc' -delete

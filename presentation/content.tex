@@ -31,6 +31,8 @@
 }
 %% Multiple columns
 \usepackage{multicol}
+%% Code listings
+\usepackage{verbatim}
 %
 % Presentation data
 %
@@ -41,7 +43,7 @@
 \institute{University of Genoa}
 \date{Q4 2020}
 %% Mine
-\newcommand{\buildrootLatestVersion}{2020.08.1}
+\newcommand{\buildrootLatestVersion}{2020.11-rc1}
 \newcommand{\buildrootLatestVersionAnnouncement}{http://lists.busybox.net/pipermail/buildroot/2020-October/294407.html}
 \newcommand{\buildrootLatestVersionDownloadLink}{https://buildroot.org/downloads/buildroot-\buildrootLatestVersion.tar.gz}
 \newcommand{\gitRepoUrl}{https://github.com/gabibbo97/basc-buildroot}
@@ -271,6 +273,7 @@ sudo apt-get install -y \
     \item $\boxtimes$ Build cross gdb for the host
     \item $\boxtimes$ TUI support
     \item Python support = Python3
+    \item GDB debugger Version = gdb 9.2.x
   \end{itemize}
 }
 %%%%
@@ -711,20 +714,7 @@ sudo systemd-nspawn \
 \begin{frame}[fragile]
   \frametitle{Booting the rootfs}
   \footnotesize
-  \begin{verbatim}
-qemu-system-arm \
-  -machine virt \
-  -cpu cortex-a7 \
-  -smp 4 -m 4096 \
-  -kernel zImage \
-  -device virtio-blk-device,drive=rootfs \
-  -drive file=rootfs.ext2,if=none,format=raw,id=rootfs \
-  -append "console=ttyAMA0,115200 rootwait root=/dev/vda" \
-  -netdev user,id=user0,hostfwd=tcp::2222-:22,hostfwd=tcp::1234-:1234 \
-  -device virtio-net-device,netdev=user0 \
-  -serial stdio \
-  -display none
-  \end{verbatim}
+  \verbatiminput{../seminar-scripts/to-include-in-output/boot-rootfs.sh}
 \end{frame}
 \only<handout> {
   QEMU system emulation requires a lot of arguments:

@@ -76,7 +76,7 @@ sudo apt-get install -y \
 ## Obtaining
 
 ```sh
-curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
+sh ./seminar-scripts/get-buildroot.sh
 ```
 
 ## Commands
@@ -111,6 +111,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
   - [x] Build cross gdb for the host
   - [x] TUI support
   - Python support = Python3
+  - GDB debugger Version = gdb 9.2.x
 - System configuration ->
   - Custom scripts to run before creating filesystem images = ./gef-python.sh
 - Filesystem images ->
@@ -121,7 +122,7 @@ curl -L https://buildroot.org/downloads/buildroot-2020.08.1.tar.gz | tar -xzf -
 - Save
 - Run `make source`
 - Run `make sdk` and go grab a coffee
-- Version `2020.08.1` will by default build you a `GCC 9.3` custom toolchain
+- Version `2020.11` will by default build you a `GCC 9` custom toolchain
 - You'll find the package inside `output/images/arm-buildroot-linux-gnueabihf_sdk-buildroot.tar.gz`
 
 To use it:
@@ -139,7 +140,7 @@ Try to build `hello-arm` with `arm-buildroot-linux-gnueabihf-gcc hello_arm.c -o 
 
 ```sh
 > file hello-arm
-hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.7.0, not stripped
+hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 5.9.0, not stripped
 ```
 
 ## Creating our own ARM buildroot
@@ -164,6 +165,7 @@ hello-arm: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically l
   - [x] Build cross gdb for the host
   - [x] TUI support
   - Python support = Python3
+  - GDB debugger Version = gdb 9.2.x
 - System configuration ->
   - Custom scripts to run before creating filesystem images = ./gef-python.sh
 - Target packages ->
@@ -232,6 +234,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
   - [x] Build cross gdb for the host
   - [x] TUI support
   - Python support = Python3
+  - GDB debugger Version = gdb 9.2.x
 - System configuration ->
   - System hostname = BASC2020
   - System banner = Welcome to BASC2020 Buildroot
@@ -270,7 +273,7 @@ sudo systemd-nspawn --register=no -D basc-rootfs /bin/qemu-arm-static /bin/sh
 qemu-system-arm \
   -machine virt \
   -cpu cortex-a7 \
-  -smp 4 -m 4096 \
+  -smp 2 -m 2000 \
   -kernel output/images/zImage \
   -device virtio-blk-device,drive=rootfs \
   -drive file=output/images/rootfs.ext2,if=none,format=raw,id=rootfs \
