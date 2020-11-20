@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e # Fail on error
 #
 # Install GEF's python dependencies
 #
@@ -21,15 +22,14 @@ if ! [ -x "${PIP_BINARY}" ]; then
     fi
   }
   downloadGetPIP
-  eval "${PYTHON_BINARY}" /tmp/get-pip.py
+  eval "${PYTHON_BINARY}" /tmp/get-pip.py --isolated
 fi
 # Install GEF prerequisites
-eval "${PIP_BINARY}" install \
+eval "${PIP_BINARY}" install --isolated \
   capstone \
   keystone-engine \
   unicorn \
   ropper \
-  pwntools \
-  frida-tools
+  pwntools
 # Delete Python compiler cache
 find "$BASE_DIR" -name '*.pyc' -delete

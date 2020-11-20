@@ -2,11 +2,18 @@
 #
 # Automatically packages everything
 #
+rm -f output/buildroot.tar
 tar \
   --create \
   --sparse \
   --verbose \
   --directory=output \
-  --zstd \
-  --file output/buildroot.tar.zst ./bootable-rootfs ./cross-compiler ./rootfs ./boot-rootfs.sh ./run-cross-gdb.sh
-(cd output && sha512sum buildroot.tar.zst > buildroot.tar.zst.sha512sums)
+  --file output/buildroot.tar ./bootable-rootfs ./cross-compiler ./rootfs ./boot-rootfs.sh ./run-cross-gdb.sh
+rm -f output/buildroot.tar.xz
+xz \
+  --compress \
+  --check=sha256 \
+  --threads=0 \
+  -9e \
+  output/buildroot.tar
+(cd output && sha512sum buildroot.tar.xz > buildroot.tar.xz.sha512sums)

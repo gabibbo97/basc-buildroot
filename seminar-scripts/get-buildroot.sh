@@ -8,7 +8,7 @@ fi
 #
 # Automatically downloads BuildRoot sources
 #
-BUILDROOT_VERSION='2020.11-rc1'
+BUILDROOT_VERSION='2020.11-rc2'
 if [ -d "buildroot-${BUILDROOT_VERSION}" ]; then
   echo 'BuildRoot already downloaded'
   exit 0

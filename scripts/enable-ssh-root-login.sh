@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e # Fail on error
+## Prepare env
 SSHD_CONFIG_FILE="${TARGET_DIR}/etc/ssh/sshd_config"
 ## Remove PermitRootLogin from config file
 tmpfile=$(mktemp)
