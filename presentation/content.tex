@@ -12,6 +12,28 @@
   text margin right=5mm
 }
 \setbeamertemplate{navigation symbols}{} % Remove controls
+% Section pages
+\AtBeginSection[]{
+  \begin{frame}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true]{title}
+      \usebeamerfont{title}\insertsectionhead\par
+    \end{beamercolorbox}
+    \vfill
+  \end{frame}
+}
+\AtBeginSubsection[]{
+  \begin{frame}
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center,rounded=true]{title}
+      \usebeamerfont{title}\insertsectionhead\par
+      \usebeamerfont{subtitle}\insertsubsectionhead\par
+    \end{beamercolorbox}
+    \vfill
+  \end{frame}
+}
 %% Draft
 \usepackage{draftwatermark}
 \SetWatermarkText{TODO}
@@ -56,6 +78,10 @@
 \begin{frame}
   \titlepage
 \end{frame}
+% ToC
+\begin{frame}[shrink]{Table of contents}
+  \tableofcontents
+\end{frame}
 %%
 %% Introduction section
 %%
@@ -85,6 +111,7 @@
     \item Automated factory controllers
     \item Point of sale devices
     \item Car multimedia units
+    \item High end Hi-Fi amplifiers
   \end{itemize}
 \end{frame}
 \subsection{Why BuildRoot}
@@ -459,6 +486,7 @@ sudo apt-get install -y \
 %%%%
 \subsection{Creating a bootable ARM root filesystem}
 \begin{frame}
+  \frametitle{Creating a bootable ARM root filesystem}
   \framesubtitle{Initial setup}
 
   \begin{enumerate}
@@ -488,7 +516,7 @@ sudo apt-get install -y \
 
 \begin{frame}
   \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 1/3}
+  \framesubtitle{Configuration options: 1/4}
   \texttt{make menuconfig}
   \begin{itemize}
     \targetOptionsList
@@ -503,7 +531,7 @@ sudo apt-get install -y \
 
 \begin{frame}
   \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 2/3}
+  \framesubtitle{Configuration options: 2/4}
   \begin{itemize}
     \toolchainOptionsList
     \item System configuration
@@ -528,7 +556,7 @@ sudo apt-get install -y \
 
 \begin{frame}
   \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 3/3}
+  \framesubtitle{Configuration options: 3/4}
   \begin{itemize}
     \item Target packages
     \begin{itemize}
@@ -540,6 +568,7 @@ sudo apt-get install -y \
         \item $\boxtimes$ TUI support
         \item $\boxtimes$ ltrace
         \item $\boxtimes$ strace
+        \item $\boxtimes$ uftrace \footnote{Available only if you used \texttt{get-buildroot.sh}}
         \item $\boxtimes$ valgrind
       \end{itemize}
       \item Networking applications
@@ -549,6 +578,18 @@ sudo apt-get install -y \
         \item $\boxtimes$ key utilities
       \end{itemize}
     \end{itemize}
+  \end{itemize}
+\end{frame}
+\only<handout> {
+  Our root filesystem will also contain gdb and its server. \\
+  Given that we will be running an actual OS, ltrace, strace and valgrind will be supported and can be used. \\
+  An OpenSSH server will allow us to connect and sync files from/to the rootfs.
+}
+
+\begin{frame}
+  \frametitle{Creating a bootable ARM root filesystem}
+  \framesubtitle{Configuration options: 4/4}
+  \begin{itemize}
     \item Filesystem images
     \begin{itemize}
       \item $\boxtimes$ ext2/3/4 root filesystem
@@ -565,15 +606,12 @@ sudo apt-get install -y \
   \end{itemize}
 \end{frame}
 \only<handout> {
-  Our root filesystem will also contain gdb and its server. \\
-  Given that we will be running an actual OS, ltrace, strace and valgrind will be supported and can be used. \\
-  An OpenSSH server will allow us to connect and sync files from/to the rootfs. \\
   We will package our root filesystem as an ext image. \\
   We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
 }
 
 \begin{frame}
-  \frametitle{Creating an ARM root filesystem}
+  \frametitle{Creating bootable ARM root filesystem}
   \framesubtitle{Performing the build}
   \begin{enumerate}
     \item Save the configuration to the default \texttt{.config} path
@@ -581,12 +619,221 @@ sudo apt-get install -y \
     \item Start the build with \texttt{make}
   \end{enumerate}
 \end{frame}
+%%
+%% Using BuildRoot section
+%%
+\section{Using our BuildRoot}
+\subsection{Producing binaries for the target}
+\begin{frame}
+  \frametitle{Using the cross-compiler}
+  \begin{enumerate}
+    \item Extract the cross-compiler
+    \item Run \texttt{relocate-sdk.sh}
+    \item Edit your \texttt{ \$PATH } variable: \texttt{export PATH="\${PATH}:\${PWD}/bin"}
+    \item You can invoke your cross compiler with commands like \texttt{arm-buildroot-linux-gnueabihf-\textit{<COMMAND NAME>}} \\
+    \textbf{Notable entries}
+    \begin{itemize}
+      \item \texttt{arm-buildroot-linux-gnueabihf-gcc}
+      \item \texttt{arm-buildroot-linux-gnueabihf-gdb}
+      \item \texttt{arm-buildroot-linux-gnueabihf-nm}
+    \end{itemize}
+  \end{enumerate}
+  \begin{alertblock}{Improving gdb with library simbols}
+    See the section \hyperlink{using gdb}{\beamergotobutton{Using gdb}}
+  \end{alertblock}
+\end{frame}
+\only<handout> {
+  \begin{enumerate}
+    \item 
+    \item this is needed because BuildRoot gdbinit file references an absolute path (the one in which this buildroot was assembled)
+      and you probably aren't running it with the same path.
+    \item this is simply a convenience, you can perform the same actions by specifying the complete path manually.
+    \item the extremely long name is actually called an \textbf{host triplet}
+    \begin{itemize}
+      \item The first component is the architecture (arm)
+      \item The following string is the optional vendor string,
+        it is used in order to distinguish between compilers targeting the same triplet (buildroot)
+      \item The second component is the target operating system (linux)
+      \item The third component is the ABI specification (gnueabi) \\
+        GNU indicates that we are using a GNU toolchain built system (gcc, GNU ld, ...) \\
+        it is relevant because on ARM we do have the concept of EABIs: \\
+        Embedded Application Binary Interfaces abstract less details of the underlying architecture and allow 
+        to minimize footprint, but compatibility between different EABIs is usually not possible.
+    \end{itemize}
+  \end{enumerate}
+}
+
+\subsection{Running dynamic executables}
+\begin{frame}[fragile]
+  \frametitle{Running dynamic executables in Docker}
+  \begin{verbatim}
+sudo docker import rootfs.tar basc-buildroot
+sudo docker run --rm -it \
+  --volume "$(which qemu-arm-static):/bin/qemu-arm-static" \
+  --volume "${PWD}/:/host" \
+  --entrypoint /bin/qemu-arm-static \
+  --workdir "/host" \
+  basc-buildroot \
+  /bin/sh
+  \end{verbatim}
+\end{frame}
+\only<handout> {
+  Docker supports importing .tar files as images for containers. \\
+  That docker import command is equivalent to pulling an image consisting of a single layer comprised of our rootfs. \\
+  We will run the executables in QEMU by leveraging the static binary provided by the host, in this configuration
+  most dynamic executables will work but some calls to fork/exec syscalls and any tracing request will fail.
+}
+
+\begin{frame}[fragile]
+  \frametitle{Running dynamic executables with systemd-nspawn}
+  \begin{verbatim}
+mkdir -p basc-rootfs
+tar -xf rootfs.tar -C basc-rootfs
+cp -f "$(which qemu-arm-static)" \
+  basc-rootfs/bin/qemu-arm-static
+sudo systemd-nspawn \
+  --register=no \
+  -D basc-rootfs \
+  /bin/qemu-arm-static /bin/sh
+  \end{verbatim}
+  \begin{alertblock}{Package needed}
+  You might need to install the package \texttt{systemd-container}
+  \end{alertblock}
+\end{frame}
+\only<handout> {
+  Systemd-nspawn is like chroot, with some nifty additions (for istance it automatically mounts the pseudo filesystems for us),
+   the -{}-register=no is due to the fact that we want an ephemeral machine and not a system service. \\
+  We will run the executables in QEMU by leveraging the static binary provided by the host, in this configuration
+  most dynamic executables will work but some calls to fork/exec syscalls and any tracing request will fail.
+}
+
+\subsection{Performing dynamic analysis}
+\begin{frame}[fragile]
+  \frametitle{Booting the rootfs}
+  \footnotesize
+  \verbatiminput{../seminar-scripts/to-include-in-output/boot-rootfs.sh}
+\end{frame}
+\only<handout> {
+  QEMU system emulation requires a lot of arguments:
+  \begin{description}
+    \item[machine] QEMU can emulate a specific machine or a more "generic" one,
+      virt is the recommended hardware configuration for general purpose ARM emulation. \\
+      The usage of a preexisting machine can also limit the availability of hardware, lock the number of cpus or cap the maximum memory available. \\
+      ARM machines do not have the equivalent of BIOS / EFI standards and so there is no hardware automatic discovery, hardware support has to be precompiled into the kernel with device tree files. \\
+      In order to avoid limitations we have explicitly compiled in VIRTIO paravirtualization drivers to make the system aware of it being emulated.
+    \item[cpu] This sets which instructions are available to the guest,
+      unincluded instructions will trap the hypervisor giving an effect similar to issuing an illegal instruction on a real cpu
+    \item[smp] Sets the number of processors
+    \item[m] Sets the amount of RAM in megabytes
+    \item[kernel] The image has no bootloader in it so we need QEMU to load the kernel for us
+    \item[device virtio-blk-device] This creates a virtual hard disk, supported by the virtio drivers we included in the kernel
+    \item[drive] This binds the disk drive to the rootfs we specified
+    \item[append] This will be the kernel command line, specifying a serial console and the root device location
+    \item[netdev] This sets up the virtual network card and forward host port 2222 to port 22 of guest and port 1234 of host to port 1234 of guest
+    \item[device virtio-net-device] This will create a virtual network card, supported by the virtio drivers we included in the kernel
+    \item[serial stdio] This will allow us to interact with the console on the calling terminal
+    \item[display none] We do not have a display nor the rootfs has support for one
+  \end{description}
+}
+
+% \begin{frame}[fragile]
+%   \frametitle{Tips and tricks}
+%   \framesubtitle{Enable SSH root login}
+
+%   \textit{In your BuildRoot shell}
+%   \begin{enumerate}
+%     \item Edit \texttt{/etc/ssh/sshd\_config} to include \texttt{PermitRootLogin yes}
+%     \item Find the \texttt{openssh} server process id number
+%     \begin{verbatim}
+% # ps | grep 'sshd'
+%   138 root     sshd: /usr/sbin/sshd [listener] 0 of 10-100 startups
+%   158 root     grep sshd
+%     \end{verbatim}
+%     \item Reload the \text{openssh} process
+%     \begin{verbatim}
+% # kill -s HUP 138
+%     \end{verbatim}
+%   \end{enumerate}
+%   \begin{block}{Automating the process}
+%     See the section on \hyperlink{cutomizing our images}{\beamergotobutton{Customizing our images}}
+%   \end{block}
+% \end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Tips and tricks}
+  \framesubtitle{Using SSH}
+  \begin{center}
+    \textbf{Opening an SSH session}
+  \end{center}
+  \begin{verbatim}
+ssh \
+  -o UserKnownHostsFile=/dev/null \
+  -o StrictHostKeyChecking=no \
+  -p 2222 root@localhost
+  \end{verbatim}
+
+  \begin{center}
+    \textbf{Sharing a folder}
+  \end{center}
+  \begin{verbatim}
+mkdir -p guest-os-ssh
+sshfs root@localhost:/ ./guest-os-ssh \
+  -f \
+  -o port=2222 \
+  -o reconnect \
+  -o UserKnownHostsFile=/dev/null \
+  -o StrictHostKeyChecking=no
+  \end{verbatim}
+\end{frame}
+\only<handout> {
+  \begin{description}
+    \item[StrictHostKeyChecking=no] in order to protect us from MITM attacks,
+      our SSH client does store the public key fingerprint of every host we connect to. \\
+      If for some reason a host we contacted before changes its public key, we will not be able
+      to connect (unless we reset the stored data) because it has changed its identity. \\
+      Since we are working on localhost with a machine we just built there's no risk disabling this setting.
+    \item[UserKnownHostsFile=/dev/null] the command given above will disable checking but our host file might
+      still be modified and accessed, by using /dev/null we preserve our SSH client's state as-is.
+  \end{description}
+  sshfs works thanks to FUSE virtual filesystem in userspace and allows accessing the remote system files as if they were attached locally.
+}
+
+\begin{frame}
+  \frametitle{Using \{l,s,uf\}trace}
+  \only<beamer> {
+    \framesubtitle{What did you expect?}
+  }
+  \begin{itemize}
+    \item \{l,s,uf\}trace do work as expected
+    \item Can only be performed on QEMU \textbf{system} emulation
+  \end{itemize}
+  Note that \textit{ltrace} has a bug with unwinding of DWARF tables on ARM and will show limited information.
+\end{frame}
+\begin{frame}
+  \frametitle{\hypertarget{using gdb}{Using gdb}}
+  \textbf{On the guest} \\
+  \texttt{gdbserver :1234 \textit{command to debug}} \\
+  \textbf{On the host} (\textit{From the cross-compiler extracted folder})\footnote{or use \texttt{run-cross-gdb.sh} from my release package} \\
+  \texttt{
+    \small
+    bin/{\tiny arm-buildroot-linux-gnueabihf-}gdb $\backslash$ \\
+      \quad -x {\tiny arm-buildroot-linux-gnueabihf}/sysroot/usr/share/buildroot/gdbinit $\backslash$ \\
+      \quad \textit{executable name}
+  } \\
+  \textbf{On the host gdb shell} attach with \texttt{target remote localhost:1234}
+\end{frame}
+\only<handout> {
+  The \texttt{-x} argument points gdb to an additional \texttt{gdbinit}. \\
+  The only command inside is \texttt{set sysroot} that will allow gdb to access libraries pertaining to the guest. \\
+  This gdb can only be used with its own gdbserver: the gdb protocol depends on the architecture. \\
+}
+
 %%%%
 %%%% Customization
 %%%%
-\subsection{Customizing our images}
-\begin{frame}[label={Customizing our images}]
-  \frametitle{Customizing our images}
+\section{Customizing our images}
+\begin{frame}
+  \frametitle{\hypertarget{customizing our images}{Customizing our images}}
   \framesubtitle{Build time overlay}
   \begin{itemize}
     \item Create a directory
@@ -640,178 +887,5 @@ sudo apt-get install -y \
     \item Repack your rootfs (with \texttt{tar -cf} for instance)
   \end{enumerate}
 \end{frame}
-%%
-%% Using BuildRoot section
-%%
-\section{Using our BuildRoot}
-\subsection{Producing binaries for the target}
-\begin{frame}
-  \frametitle{Using the cross-compiler}
-  \begin{enumerate}
-    \item Extract the cross-compiler
-    \item Run \texttt{relocate-sdk.sh}
-    \item Edit your \texttt{ \$PATH } variable: \texttt{export PATH="\${PATH}:\${PWD}/bin"}
-    \item You can invoke your cross compiler with commands like \texttt{arm-buildroot-linux-gnueabihf-\textit{<COMMAND NAME>}} \\
-    \textbf{Notable entries}
-    \begin{itemize}
-      \item \texttt{arm-buildroot-linux-gnueabihf-gcc}
-      \item \texttt{arm-buildroot-linux-gnueabihf-gdb}
-      \item \texttt{arm-buildroot-linux-gnueabihf-nm}
-    \end{itemize}
-  \end{enumerate}
-  \begin{alertblock}{Improving gdb with library simbols}
-    See the section \hyperlink{important}{\beamergotobutton{Using gdb}}
-  \end{alertblock}
-\end{frame}
-
-\subsection{Running dynamic executables}
-\begin{frame}[fragile]
-  \frametitle{Running dynamic executables in Docker}
-  \begin{verbatim}
-sudo docker import rootfs.tar basc-buildroot
-sudo docker run --rm -it \
-  --volume "$(which qemu-arm-static):/bin/qemu-arm-static" \
-  --volume "${PWD}/:/host" \
-  --entrypoint /bin/qemu-arm-static \
-  --workdir "/host" \
-  basc-buildroot \
-  /bin/sh
-  \end{verbatim}
-\end{frame}
-\only<handout> {
-  Docker supports importing .tar files as images for containers. \\
-  That docker import command is equivalent to pulling an image consisting of a single layer comprised of our rootfs. \\
-  We will run the executables in QEMU by leveraging the static binary provided by the host, in this configuration
-  most dynamic executables will work but some calls to fork/exec syscalls and any tracing request will fail.
-}
-
-\begin{frame}[fragile]
-  \frametitle{Running dynamic executables with systemd-nspawn}
-  \begin{verbatim}
-mkdir -p basc-rootfs
-tar -xf rootfs.tar -C basc-rootfs
-cp -f "$(which qemu-arm-static)" \
-  basc-rootfs/bin/qemu-arm-static
-sudo systemd-nspawn \
-  --register=no \
-  -D basc-rootfs \
-  /bin/qemu-arm-static /bin/sh
-  \end{verbatim}
-  \begin{alertblock}{Package needed}
-  You might need to install the package \texttt{systemd-container}
-  \end{alertblock}
-\end{frame}
-\only<handout> {
-  Systemd-nspawn is like chroot, with some nifty additions (for istance it automatically mounts the pseudo filesystems for us),
-   the --register=no is due to the fact that we want an ephemeral machine and not a system service. \\
-  We will run the executables in QEMU by leveraging the static binary provided by the host, in this configuration
-  most dynamic executables will work but some calls to fork/exec syscalls and any tracing request will fail.
-}
-
-\subsection{Performing dynamic analysis}
-\begin{frame}[fragile]
-  \frametitle{Booting the rootfs}
-  \footnotesize
-  \verbatiminput{../seminar-scripts/to-include-in-output/boot-rootfs.sh}
-\end{frame}
-\only<handout> {
-  QEMU system emulation requires a lot of arguments:
-  \begin{description}
-    \item[machine] QEMU can emulate a specific machine or a more "generic" one,
-      virt is the recommended hardware configuration for general purpose ARM emulation. \\
-      The usage of a preexisting machine can also limit the availability of hardware, lock the number of cpus or cap the maximum memory available. \\
-      ARM machines do not have the equivalent of BIOS / EFI standards and so there is no hardware automatic discovery, hardware support has to be precompiled into the kernel with device tree files. \\
-      In order to avoid limitations we have explicitly compiled in VIRTIO paravirtualization drivers to make the system aware of it being emulated.
-    \item[cpu] This sets which instructions are available to the guest,
-      unincluded instructions will trap the hypervisor giving an effect similar to issuing an illegal instruction on a real cpu
-    \item[smp] Sets the number of processors
-    \item[m] Sets the amount of RAM in megabytes
-    \item[kernel] The image has no bootloader in it so we need QEMU to load the kernel for us
-    \item[device virtio-blk-device] This creates a virtual hard disk, supported by the virtio drivers we included in the kernel
-    \item[drive] This binds the disk drive to the rootfs we specified
-    \item[append] This will be the kernel command line, specifying a serial console and the root device location
-    \item[netdev] This sets up the virtual network card and forward host port 2222 to port 22 of guest and port 1234 of host to port 1234 of guest
-    \item[device virtio-net-device] This will create a virtual network card, supported by the virtio drivers we included in the kernel
-    \item[serial stdio] This will allow us to interact with the console on the calling terminal
-    \item[display none] We do not have a display nor the rootfs has support for one
-  \end{description}
-}
-
-% \begin{frame}[fragile]
-%   \frametitle{Tips and tricks}
-%   \framesubtitle{Enable SSH root login}
-
-%   \textit{In your BuildRoot shell}
-%   \begin{enumerate}
-%     \item Edit \texttt{/etc/ssh/sshd\_config} to include \texttt{PermitRootLogin yes}
-%     \item Find the \texttt{openssh} server process id number
-%     \begin{verbatim}
-% # ps | grep 'sshd'
-%   138 root     sshd: /usr/sbin/sshd [listener] 0 of 10-100 startups
-%   158 root     grep sshd
-%     \end{verbatim}
-%     \item Reload the \text{openssh} process
-%     \begin{verbatim}
-% # kill -s HUP 138
-%     \end{verbatim}
-%   \end{enumerate}
-%   \begin{block}{Automating the process}
-%     See the section on \hyperlink{important}{\beamergotobutton{Customizing our images}}
-%   \end{block}
-% \end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Tips and tricks}
-  \framesubtitle{Using SSH}
-  \begin{center}
-    \textbf{Opening an SSH session}
-  \end{center}
-  \begin{verbatim}
-ssh \
-  -o UserKnownHostsFile=/dev/null \
-  -o StrictHostKeyChecking=no \
-  -p 2222 root@localhost
-  \end{verbatim}
-
-  \begin{center}
-    \textbf{Sharing a folder}
-  \end{center}
-  \begin{verbatim}
-mkdir -p guest-os-ssh
-sshfs root@localhost:/ ./guest-os-ssh \
-  -f \
-  -o port=2222 \
-  -o reconnect \
-  -o UserKnownHostsFile=/dev/null \
-  -o StrictHostKeyChecking=no
-  \end{verbatim}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Using \{l,s,uf\}trace}
-  \framesubtitle{What did you expect?}
-  \begin{itemize}
-    \item \{l,s,uf\}trace do work as expected
-    \item Can only be performed on QEMU \textbf{system} emulation
-  \end{itemize}
-  Note that \textit{ltrace} has a bug with unwinding of DWARF tables on ARM and will show limited information.
-\end{frame}
-\begin{frame}
-  \frametitle{Using gdb}
-  \textbf{On the guest} \\
-  \texttt{gdbserver :1234 \textit{command to debug}} \\
-  \textbf{On the host} (\textit{From the cross-compiler extracted folder}) \\
-  \texttt{
-    \small
-    bin/{\tiny arm-buildroot-linux-gnueabihf-}gdb $\backslash$ \\
-      \quad -x {\tiny arm-buildroot-linux-gnueabihf}/sysroot/usr/share/buildroot/gdbinit $\backslash$ \\
-      \quad \textit{executable name}
-  }\\
-  \textbf{On the host gdb shell} attach with \texttt{target remote localhost:1234}
-\end{frame}
-\only<handout> {
-  The \texttt{-x} argument points gdb to an additional \texttt{gdbinit}. \\
-  The only command inside is \texttt{set sysroot} that will allow gdb to access libraries pertaining to the guest
-}
 
 \end{document}
