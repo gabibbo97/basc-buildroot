@@ -29,6 +29,7 @@ output/bootable-rootfs: output/rootfs get-buildroot
 
 package: output/bootable-rootfs output/rootfs output/cross-compiler
 	cp $(SCRIPTS_DIR)/to-include-in-output/* output
+	find output -maxdepth 1 -name '*.sh' -exec chmod +x {} \;
 	$(SCRIPTS_DIR)/autobuild-package.sh
 #
 # Presentation subtarget

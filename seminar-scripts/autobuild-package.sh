@@ -8,7 +8,13 @@ tar \
   --sparse \
   --verbose \
   --directory=output \
-  --file output/buildroot.tar ./bootable-rootfs ./cross-compiler ./rootfs ./boot-rootfs.sh ./run-cross-gdb.sh
+  --file output/buildroot.tar ./bootable-rootfs ./cross-compiler ./rootfs \
+    ./boot-rootfs.sh \
+    ./run-cross-gcc.sh \
+    ./run-cross-gdb.sh \
+    ./ssh.sh \
+    ./sshfs.sh \
+    ./systemd-nspawn.sh
 rm -f output/buildroot.tar.xz
 xz \
   --compress \

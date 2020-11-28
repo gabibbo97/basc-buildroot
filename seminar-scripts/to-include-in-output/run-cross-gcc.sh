@@ -6,7 +6,6 @@ if ! [ -d ./cross-compiler/arm-buildroot-linux-gnueabihf_sdk-buildroot ]; then
   echo 'Extracted'
 fi
 # Find components
-GDB=$(find ./cross-compiler -type f,l -executable -name '*-gdb' | head -n 1)
-GDBINIT=$(find ./cross-compiler -type f -name 'gdbinit' | head -n 1)
-# Run GDB
-exec "$GDB" -x "$GDBINIT" "$@"
+GCC=$(find ./cross-compiler -type f,l -executable -name '*-gcc' | head -n 1)
+# Run
+exec "$GCC" "$@"
