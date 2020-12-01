@@ -55,6 +55,15 @@
 \usepackage{multicol}
 %% Code listings
 \usepackage{verbatim}
+\usepackage{listings}
+\lstset{
+  language=sh,
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle=\color{brown},
+  stringstyle=\color{violet},
+  columns=fullflexible,
+  showstringspaces=false
+}
 %
 % Presentation data
 %
@@ -98,32 +107,32 @@
     Official website: \url{https://buildroot.org}
   \end{center}
   \begin{itemize}
-    \item Born in 2005
-    \item Entirely based on \href{https://en.wikipedia.org/wiki/Make_(software)}{makefiles} and \href{https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html}{kconfig}
-    \item Only one goal: \textit{producing root file system images} for \textit{100\% custom Linux systems}
+    \item<1-> Born in 2005
+    \item<2-> Entirely based on \href{https://en.wikipedia.org/wiki/Make_(software)}{makefiles} and \href{https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html}{kconfig}
+    \item<3-> Only one goal: \textit{producing root file system images} for \textit{100\% custom Linux systems}
   \end{itemize}
 \end{frame}
 \begin{frame}
   \frametitle{BuildRoot users}
   The most prominent users of BuildRoot are using it for building:
   \begin{itemize}
-    \item IoT devices
-    \item Automated factory controllers
-    \item Point of sale devices
-    \item Car multimedia units
-    \item High end Hi-Fi amplifiers
+    \item<1-> IoT devices
+    \item<2-> Automated factory controllers
+    \item<3-> Point of sale devices
+    \item<4-> Car multimedia units
+    \item<5-> High end Hi-Fi amplifiers
   \end{itemize}
 \end{frame}
 \subsection{Why BuildRoot}
 \begin{frame}
   \frametitle{Why BuildRoot}
   \begin{itemize}
-    \item Each buildroot is a 100\% custom Linux "mini-distro"
-    \item Buildroot images can be less than 100MB or even 10MB
-    \item Complete customization of target architecture and build flags
-    \item Multiple compiler / libc / system layout choices
-    \item Updated every 3 months {\small current version is \buildrootLatestVersion}
-    \item Easily extendable
+    \item<1-> Each buildroot is a 100\% custom Linux "mini-distro"
+    \item<2-> Buildroot images can be less than 100MB or even 10MB
+    \item<3-> Complete customization of target architecture and build flags
+    \item<4-> Multiple compiler / libc / system layout choices
+    \item<5-> Updated every 3 months {\small current version is \buildrootLatestVersion}
+    \item<6-> Easily extendable
   \end{itemize}
 \end{frame}
 \begin{frame}
@@ -160,12 +169,12 @@
     \begin{column}{.5\textwidth}
       \textbf{What the user sees}
       \begin{enumerate}
-        \item Create a configuration file
-        \item Start the build
-        \item Flash the image on the device
+        \item<1-> Create a configuration file
+        \item<2-> Start the build
+        \item<4-> Flash the image on the device
       \end{enumerate}
     \end{column}
-    \begin{column}{.5\textwidth}
+    \begin{column}{.5\textwidth}<3->
       \textbf{What BuildRoot does}
       \begin{enumerate}
         \item Build a cross compiler on our machine
@@ -187,7 +196,7 @@
   \begin{columns}[t]
     \begin{column}{.5\textwidth}
       \textbf{Ubuntu 20.04}
-      \begin{verbatim}
+      \begin{lstlisting}
 sudo apt-get update
 sudo apt-get install -y \
   curl tar \
@@ -196,7 +205,7 @@ sudo apt-get install -y \
   libncurses-dev libssl-dev \
   qemu-user-static \
   qemu-system-arm
-      \end{verbatim}
+      \end{lstlisting}
     \end{column}
     \begin{column}{.5\textwidth}
       \textbf{Others} \\
@@ -305,320 +314,326 @@ sudo apt-get install -y \
 %%%% ARM cross compiler
 %%%%
 \subsection{Creating an ARM cross compiler}
-\begin{frame}
-  \frametitle{Creating an ARM cross compiler}
-  \framesubtitle{Initial setup}
-
-  \begin{enumerate}
-    \item \texttt{ cd buildroot-\buildrootLatestVersion }
-    \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
-    \item \texttt{ chmod +x *.sh }
-    \item \texttt{ make distclean }
-    \item \texttt{ make defconfig }
-  \end{enumerate}
-
-\end{frame}
 \only<handout> {
-  Steps explaination
-  \begin{enumerate}
-    \item \enteringBuildRootDirectoryDescription
-    \item \gefPythonDescription
-    \item \scriptShouldBeExecutableDescription
-    \item \makeCleanDescription
-    \item \makeDefConfigDescription
-  \end{enumerate}
-}
+  \begin{frame}
+    \frametitle{Creating an ARM cross compiler}
+    \framesubtitle{Initial setup}
 
-\begin{frame}
-  \frametitle{Creating an ARM cross compiler}
-  \framesubtitle{Configuration options: 1/2}
-  \texttt{make menuconfig}
-  \begin{itemize}
-    \targetOptionsList
-    \buildOptionsList
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \targetOptionsDescription \\
-  \buildOptionsDescription
-}
+    \begin{enumerate}
+      \item \texttt{ cd buildroot-\buildrootLatestVersion }
+      \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
+      \item \texttt{ chmod +x *.sh }
+      \item \texttt{ make distclean }
+      \item \texttt{ make defconfig }
+    \end{enumerate}
 
-\begin{frame}
-  \frametitle{Creating an ARM cross compiler}
-  \framesubtitle{Configuration options: 2/2}
-  \begin{itemize}
-    \toolchainOptionsList
-    \item System configuration
-    \begin{itemize}
-      \item Custom scripts to run before creating filesystem images = ./gef-python.sh
-    \end{itemize}
-    \item Filesystem images
-    \begin{itemize}
-      \item $\square$ tar the root filesystem
-    \end{itemize}
-    \item Host utilities
-    \begin{itemize}
-      \item host python3
-      \item ssl
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \toolchainOptionsDescription \\
-  \gefPythonDescription \\
-  We do not need a root filesystem to build a crosscompiler. \\
-  We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
-}
+  \end{frame}
+  \only<handout> {
+    Steps explaination
+    \begin{enumerate}
+      \item \enteringBuildRootDirectoryDescription
+      \item \gefPythonDescription
+      \item \scriptShouldBeExecutableDescription
+      \item \makeCleanDescription
+      \item \makeDefConfigDescription
+    \end{enumerate}
+  }
 
-\begin{frame}
-  \frametitle{Creating an ARM cross compiler}
-  \framesubtitle{Performing the build}
-  \begin{enumerate}
-    \item Save the configuration to the default \texttt{.config} path
-    \item Download sources with \texttt{make source}
-    \item Start the build with \texttt{make sdk}
-  \end{enumerate}
-\end{frame}
+  \begin{frame}
+    \frametitle{Creating an ARM cross compiler}
+    \framesubtitle{Configuration options: 1/2}
+    \texttt{make menuconfig}
+    \begin{itemize}
+      \targetOptionsList
+      \buildOptionsList
+    \end{itemize}
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \targetOptionsDescription \\
+    \buildOptionsDescription
+  }
+
+  \begin{frame}
+    \frametitle{Creating an ARM cross compiler}
+    \framesubtitle{Configuration options: 2/2}
+    \begin{itemize}
+      \toolchainOptionsList
+      \item System configuration
+      \begin{itemize}
+        \item Custom scripts to run before creating filesystem images = ./gef-python.sh
+      \end{itemize}
+      \item Filesystem images
+      \begin{itemize}
+        \item $\square$ tar the root filesystem
+      \end{itemize}
+      \item Host utilities
+      \begin{itemize}
+        \item host python3
+        \item ssl
+      \end{itemize}
+    \end{itemize}
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \toolchainOptionsDescription \\
+    \gefPythonDescription \\
+    We do not need a root filesystem to build a crosscompiler. \\
+    We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
+  }
+
+  \begin{frame}
+    \frametitle{Creating an ARM cross compiler}
+    \framesubtitle{Performing the build}
+    \begin{enumerate}
+      \item Save the configuration to the default \texttt{.config} path
+      \item Download sources with \texttt{make source}
+      \item Start the build with \texttt{make sdk}
+    \end{enumerate}
+  \end{frame}
+}
 %%%%
 %%%% ARM rootfs
 %%%%
 \subsection{Creating an ARM root filesystem}
-\begin{frame}
-  \frametitle{Creating an ARM root filesystem}
-  \framesubtitle{Initial setup}
-
-  \begin{enumerate}
-    \item \texttt{ cd buildroot-\buildrootLatestVersion }
-    \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
-    \item \texttt{ chmod +x *.sh }
-    \item \texttt{ make distclean }
-    \item \texttt{ make defconfig }
-  \end{enumerate}
-
-\end{frame}
 \only<handout> {
-  Steps explaination
-  \begin{enumerate}
-    \item \enteringBuildRootDirectoryDescription
-    \item \gefPythonDescription
-    \item \scriptShouldBeExecutableDescription
-    \item \makeCleanDescription
-    \item \makeDefConfigDescription
-  \end{enumerate}
-}
+  \begin{frame}
+    \frametitle{Creating an ARM root filesystem}
+    \framesubtitle{Initial setup}
 
-\begin{frame}
-  \frametitle{Creating an ARM root filesystem}
-  \framesubtitle{Configuration options: 1/3}
-  \texttt{make menuconfig}
-  \begin{itemize}
-    \targetOptionsList
-    \buildOptionsList
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \targetOptionsDescription \\
-  \buildOptionsDescription
-}
+    \begin{enumerate}
+      \item \texttt{ cd buildroot-\buildrootLatestVersion }
+      \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
+      \item \texttt{ chmod +x *.sh }
+      \item \texttt{ make distclean }
+      \item \texttt{ make defconfig }
+    \end{enumerate}
 
-\begin{frame}
-  \frametitle{Creating an ARM root filesystem}
-  \framesubtitle{Configuration options: 2/3}
-  \begin{itemize}
-    \toolchainOptionsList
-    \item System configuration
+  \end{frame}
+  \only<handout> {
+    Steps explaination
+    \begin{enumerate}
+      \item \enteringBuildRootDirectoryDescription
+      \item \gefPythonDescription
+      \item \scriptShouldBeExecutableDescription
+      \item \makeCleanDescription
+      \item \makeDefConfigDescription
+    \end{enumerate}
+  }
+
+  \begin{frame}
+    \frametitle{Creating an ARM root filesystem}
+    \framesubtitle{Configuration options: 1/3}
+    \texttt{make menuconfig}
     \begin{itemize}
-      \item Custom scripts to run before creating filesystem images = ./gef-python.sh
+      \targetOptionsList
+      \buildOptionsList
     \end{itemize}
-    \item Target packages
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \targetOptionsDescription \\
+    \buildOptionsDescription
+  }
+
+  \begin{frame}
+    \frametitle{Creating an ARM root filesystem}
+    \framesubtitle{Configuration options: 2/3}
     \begin{itemize}
-      \item Debugging, profiling and benchmark
+      \toolchainOptionsList
+      \item System configuration
       \begin{itemize}
-        \item $\boxtimes$ gdb
-        \item $\boxtimes$ full debugger
-        \item $\boxtimes$ gdbserver
-        \item $\boxtimes$ TUI support
+        \item Custom scripts to run before creating filesystem images = ./gef-python.sh
+      \end{itemize}
+      \item Target packages
+      \begin{itemize}
+        \item Debugging, profiling and benchmark
+        \begin{itemize}
+          \item $\boxtimes$ gdb
+          \item $\boxtimes$ full debugger
+          \item $\boxtimes$ gdbserver
+          \item $\boxtimes$ TUI support
+        \end{itemize}
       \end{itemize}
     \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \toolchainOptionsDescription \\
-  \gefPythonDescription \\
-  Our root filesystem will also contain gdb and its server.
-}
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \toolchainOptionsDescription \\
+    \gefPythonDescription \\
+    Our root filesystem will also contain gdb and its server.
+  }
 
-\begin{frame}
-  \frametitle{Creating an ARM root filesystem}
-  \framesubtitle{Configuration options: 3/3}
-  \begin{itemize}
-    \item Filesystem images
+  \begin{frame}
+    \frametitle{Creating an ARM root filesystem}
+    \framesubtitle{Configuration options: 3/3}
     \begin{itemize}
-      \item $\boxtimes$ tar the root filesystem
+      \item Filesystem images
+      \begin{itemize}
+        \item $\boxtimes$ tar the root filesystem
+      \end{itemize}
+      \item Host utilities
+      \begin{itemize}
+        \item host python3
+        \item ssl
+      \end{itemize}
     \end{itemize}
-    \item Host utilities
-    \begin{itemize}
-      \item host python3
-      \item ssl
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  We will package our root filesystem as a tar file. \\
-  We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
-}
+  \end{frame}
+  \only<handout> {
+    We will package our root filesystem as a tar file. \\
+    We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
+  }
 
-\begin{frame}
-  \frametitle{Creating an ARM root filesystem}
-  \framesubtitle{Performing the build}
-  \begin{enumerate}
-    \item Save the configuration to the default \texttt{.config} path
-    \item Download sources with \texttt{make source}
-    \item Start the build with \texttt{make}
-  \end{enumerate}
-\end{frame}
+  \begin{frame}
+    \frametitle{Creating an ARM root filesystem}
+    \framesubtitle{Performing the build}
+    \begin{enumerate}
+      \item Save the configuration to the default \texttt{.config} path
+      \item Download sources with \texttt{make source}
+      \item Start the build with \texttt{make}
+    \end{enumerate}
+  \end{frame}
+}
 %%%%
 %%%% ARM bootable rootfs
 %%%%
 \subsection{Creating a bootable ARM root filesystem}
-\begin{frame}
-  \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Initial setup}
-
-  \begin{enumerate}
-    \item \texttt{ cd buildroot-\buildrootLatestVersion }
-    \item \texttt{ cp ../kconfigs/virtio.kconfig ./virtio.kconfig }
-    \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
-    \item \texttt{ cp ../scripts/enable-ssh-root-login.sh ./enable-ssh-root-login.sh }
-    \item \texttt{ chmod +x *.sh }
-    \item \texttt{ make distclean }
-    \item \texttt{ make defconfig }
-  \end{enumerate}
-
-\end{frame}
 \only<handout> {
-  Steps explaination
-  \begin{enumerate}
-    \item \enteringBuildRootDirectoryDescription
-    \item In order to use our built rootfs inside QEMU we need to add some Kernel modules,
-      this file contains the kernel configuration options that should be set to support smooth virtualization under QEMU
-    \item \gefPythonDescription
-    \item \sshRootLoginDescription
-    \item \scriptShouldBeExecutableDescription
-    \item \makeCleanDescription
-    \item \makeDefConfigDescription
-  \end{enumerate}
-}
+  \begin{frame}
+    \frametitle{Creating a bootable ARM root filesystem}
+    \framesubtitle{Initial setup}
 
-\begin{frame}
-  \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 1/4}
-  \texttt{make menuconfig}
-  \begin{itemize}
-    \targetOptionsList
-    \buildOptionsList
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \targetOptionsDescription \\
-  \buildOptionsDescription
-}
+    \begin{enumerate}
+      \item \texttt{ cd buildroot-\buildrootLatestVersion }
+      \item \texttt{ cp ../kconfigs/virtio.kconfig ./virtio.kconfig }
+      \item \texttt{ cp ../scripts/gef-python.sh ./gef-python.sh }
+      \item \texttt{ cp ../scripts/enable-ssh-root-login.sh ./enable-ssh-root-login.sh }
+      \item \texttt{ chmod +x *.sh }
+      \item \texttt{ make distclean }
+      \item \texttt{ make defconfig }
+    \end{enumerate}
 
-\begin{frame}
-  \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 2/4}
-  \begin{itemize}
-    \toolchainOptionsList
-    \item System configuration
+  \end{frame}
+  \only<handout> {
+    Steps explaination
+    \begin{enumerate}
+      \item \enteringBuildRootDirectoryDescription
+      \item In order to use our built rootfs inside QEMU we need to add some Kernel modules,
+        this file contains the kernel configuration options that should be set to support smooth virtualization under QEMU
+      \item \gefPythonDescription
+      \item \sshRootLoginDescription
+      \item \scriptShouldBeExecutableDescription
+      \item \makeCleanDescription
+      \item \makeDefConfigDescription
+    \end{enumerate}
+  }
+
+  \begin{frame}
+    \frametitle{Creating a bootable ARM root filesystem}
+    \framesubtitle{Configuration options: 1/4}
+    \texttt{make menuconfig}
     \begin{itemize}
-      \item System hostname = BASC2020
-      \item System banner = Welcome to BASC2020 Buildroot
-      \item Root password = BASC2020
-      \item Network interface to configure through DHCP = eth0
-      \item Custom scripts to run before creating filesystem images = ./enable-ssh-root-login.sh ./gef-python.sh
+      \targetOptionsList
+      \buildOptionsList
     \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Options explaination \\
-  \toolchainOptionsDescription \\
-  The system customization of hostname / banner is simply aestetic. \\
-  The root password has to be set in order to be able to login. \\
-  We choose to automatically configure the first ethernet network interface in order to avoid bothering with networking settings after the rootfs will be booted in QEMU. \\
-  \sshRootLoginDescription \\
-  \gefPythonDescription
-}
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \targetOptionsDescription \\
+    \buildOptionsDescription
+  }
 
-\begin{frame}
-  \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 3/4}
-  \begin{itemize}
-    \item Target packages
+  \begin{frame}
+    \frametitle{Creating a bootable ARM root filesystem}
+    \framesubtitle{Configuration options: 2/4}
     \begin{itemize}
-      \item Debugging, profiling and benchmark
+      \toolchainOptionsList
+      \item System configuration
       \begin{itemize}
-        \item $\boxtimes$ gdb
-        \item $\boxtimes$ full debugger
-        \item $\boxtimes$ gdbserver
-        \item $\boxtimes$ TUI support
-        \item $\boxtimes$ ltrace
-        \item $\boxtimes$ strace
-        \item $\boxtimes$ uftrace \footnote{Available only if you used \texttt{get-buildroot.sh}}
-        \item $\boxtimes$ valgrind
-      \end{itemize}
-      \item Networking applications
-      \begin{itemize}
-        \item $\boxtimes$ openssh
-        \item $\square$ client
-        \item $\boxtimes$ key utilities
+        \item System hostname = BASC2020
+        \item System banner = Welcome to BASC2020 Buildroot
+        \item Root password = BASC2020
+        \item Network interface to configure through DHCP = eth0
+        \item Custom scripts to run before creating filesystem images = ./enable-ssh-root-login.sh ./gef-python.sh
       \end{itemize}
     \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  Our root filesystem will also contain gdb and its server. \\
-  Given that we will be running an actual OS, ltrace, strace and valgrind will be supported and can be used. \\
-  An OpenSSH server will allow us to connect and sync files from/to the rootfs.
-}
+  \end{frame}
+  \only<handout> {
+    Options explaination \\
+    \toolchainOptionsDescription \\
+    The system customization of hostname / banner is simply aestetic. \\
+    The root password has to be set in order to be able to login. \\
+    We choose to automatically configure the first ethernet network interface in order to avoid bothering with networking settings after the rootfs will be booted in QEMU. \\
+    \sshRootLoginDescription \\
+    \gefPythonDescription
+  }
 
-\begin{frame}
-  \frametitle{Creating a bootable ARM root filesystem}
-  \framesubtitle{Configuration options: 4/4}
-  \begin{itemize}
-    \item Filesystem images
+  \begin{frame}
+    \frametitle{Creating a bootable ARM root filesystem}
+    \framesubtitle{Configuration options: 3/4}
     \begin{itemize}
-      \item $\boxtimes$ ext2/3/4 root filesystem
+      \item Target packages
       \begin{itemize}
-        \item exact size = 512M
+        \item Debugging, profiling and benchmark
+        \begin{itemize}
+          \item $\boxtimes$ gdb
+          \item $\boxtimes$ full debugger
+          \item $\boxtimes$ gdbserver
+          \item $\boxtimes$ TUI support
+          \item $\boxtimes$ ltrace
+          \item $\boxtimes$ strace
+          \item $\boxtimes$ uftrace \footnote{Available only if you used \texttt{get-buildroot.sh}}
+          \item $\boxtimes$ valgrind
+        \end{itemize}
+        \item Networking applications
+        \begin{itemize}
+          \item $\boxtimes$ openssh
+          \item $\square$ client
+          \item $\boxtimes$ key utilities
+        \end{itemize}
       \end{itemize}
-      \item $\square$ tar the root filesystem
     \end{itemize}
-    \item Host utilities
-    \begin{itemize}
-      \item host python3
-      \item ssl
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-\only<handout> {
-  We will package our root filesystem as an ext image. \\
-  We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
-}
+  \end{frame}
+  \only<handout> {
+    Our root filesystem will also contain gdb and its server. \\
+    Given that we will be running an actual OS, ltrace, strace and valgrind will be supported and can be used. \\
+    An OpenSSH server will allow us to connect and sync files from/to the rootfs.
+  }
 
-\begin{frame}
-  \frametitle{Creating bootable ARM root filesystem}
-  \framesubtitle{Performing the build}
-  \begin{enumerate}
-    \item Save the configuration to the default \texttt{.config} path
-    \item Download sources with \texttt{make source}
-    \item Start the build with \texttt{make}
-  \end{enumerate}
-\end{frame}
+  \begin{frame}
+    \frametitle{Creating a bootable ARM root filesystem}
+    \framesubtitle{Configuration options: 4/4}
+    \begin{itemize}
+      \item Filesystem images
+      \begin{itemize}
+        \item $\boxtimes$ ext2/3/4 root filesystem
+        \begin{itemize}
+          \item exact size = 512M
+        \end{itemize}
+        \item $\square$ tar the root filesystem
+      \end{itemize}
+      \item Host utilities
+      \begin{itemize}
+        \item host python3
+        \item ssl
+      \end{itemize}
+    \end{itemize}
+  \end{frame}
+  \only<handout> {
+    We will package our root filesystem as an ext image. \\
+    We need Python for GEF and OpenSSL in order to install GEF's dependencies using PIP.
+  }
+
+  \begin{frame}
+    \frametitle{Creating bootable ARM root filesystem}
+    \framesubtitle{Performing the build}
+    \begin{enumerate}
+      \item Save the configuration to the default \texttt{.config} path
+      \item Download sources with \texttt{make source}
+      \item Start the build with \texttt{make}
+    \end{enumerate}
+  \end{frame}
+}
 %%
 %% Using BuildRoot section
 %%
@@ -666,7 +681,7 @@ sudo apt-get install -y \
 \subsection{Running dynamic executables}
 \begin{frame}[fragile]
   \frametitle{Running dynamic executables in Docker}
-  \begin{verbatim}
+  \begin{lstlisting}[language=sh]
 sudo docker import rootfs.tar basc-buildroot
 sudo docker run --rm -it \
   --volume "$(which qemu-arm-static):/bin/qemu-arm-static" \
@@ -675,7 +690,7 @@ sudo docker run --rm -it \
   --workdir "/host" \
   basc-buildroot \
   /bin/sh
-  \end{verbatim}
+  \end{lstlisting}
 \end{frame}
 \only<handout> {
   Docker supports importing .tar files as images for containers. \\
@@ -686,7 +701,7 @@ sudo docker run --rm -it \
 
 \begin{frame}[fragile]
   \frametitle{Running dynamic executables with systemd-nspawn}
-  \begin{verbatim}
+  \begin{lstlisting}
 mkdir -p basc-rootfs
 tar -xf rootfs.tar -C basc-rootfs
 cp -f "$(which qemu-arm-static)" \
@@ -695,7 +710,7 @@ sudo systemd-nspawn \
   --register=no \
   -D basc-rootfs \
   /bin/qemu-arm-static /bin/sh
-  \end{verbatim}
+  \end{lstlisting}
   \begin{alertblock}{Package needed}
   You might need to install the package \texttt{systemd-container}
   \end{alertblock}
@@ -710,8 +725,7 @@ sudo systemd-nspawn \
 \subsection{Performing dynamic analysis}
 \begin{frame}[fragile]
   \frametitle{Booting the rootfs}
-  \footnotesize
-  \verbatiminput{../seminar-scripts/to-include-in-output/boot-rootfs.sh}
+  \lstinputlisting{../seminar-scripts/to-include-in-output/boot-rootfs.sh}
 \end{frame}
 \only<handout> {
   QEMU system emulation requires a lot of arguments:
@@ -765,25 +779,12 @@ sudo systemd-nspawn \
   \begin{center}
     \textbf{Opening an SSH session}
   \end{center}
-  \begin{verbatim}
-ssh \
-  -o UserKnownHostsFile=/dev/null \
-  -o StrictHostKeyChecking=no \
-  -p 2222 root@localhost
-  \end{verbatim}
+  \lstinputlisting[firstline=2]{../seminar-scripts/to-include-in-output/ssh.sh}
 
   \begin{center}
     \textbf{Sharing a folder}
   \end{center}
-  \begin{verbatim}
-mkdir -p guest-os-ssh
-sshfs root@localhost:/ ./guest-os-ssh \
-  -f \
-  -o port=2222 \
-  -o reconnect \
-  -o UserKnownHostsFile=/dev/null \
-  -o StrictHostKeyChecking=no
-  \end{verbatim}
+  \lstinputlisting[firstline=2]{../seminar-scripts/to-include-in-output/sshfs.sh}
 \end{frame}
 \only<handout> {
   \begin{description}
@@ -807,7 +808,9 @@ sshfs root@localhost:/ ./guest-os-ssh \
     \item \{l,s,uf\}trace do work as expected
     \item Can only be performed on QEMU \textbf{system} emulation
   \end{itemize}
-  Note that \textit{ltrace} has a bug with unwinding of DWARF tables on ARM and will show limited information.
+  \begin{alertblock}{ltrace is buggy on ARM}
+    \textit{ltrace} has a bug with unwinding DWARF tables on ARM and will show limited information.
+  \end{alertblock}
 \end{frame}
 \begin{frame}
   \frametitle{\hypertarget{using gdb}{Using gdb}}
