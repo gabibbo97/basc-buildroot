@@ -1,24 +1,10 @@
 #!/bin/sh
 #
-# Automatically packages everything
+# Build the release package
 #
-rm -f output/buildroot.tar
-tar \
-  --create \
-  --verbose \
-  --directory=output \
-  --file output/buildroot.tar ./bootable-rootfs ./cross-compiler ./rootfs \
-    ./boot-rootfs.sh \
-    ./run-cross-gcc.sh \
-    ./run-cross-gdb.sh \
-    ./ssh.sh \
-    ./sshfs.sh \
-    ./systemd-nspawn.sh
-rm -f output/buildroot.tar.xz
-xz \
-  --compress \
-  --check=sha256 \
-  --threads=0 \
-  -9e \
-  output/buildroot.tar
-(cd output && sha512sum buildroot.tar.xz > buildroot.tar.xz.sha512sums)
+# Copy scripts
+find ./seminar-scripts/to-include-in-output -type f -exec cp -f {} ./output \;
+find ./output -type f -name '*.sh' -exec chmod +x {} \;
+# Tar everything
+tar -cJvf buildroot.tar.xz -C output .
+sha512sum buildroot.tar.xz > buildroot.tar.xz.sha512sums

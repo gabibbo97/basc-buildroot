@@ -3,14 +3,11 @@
 # Automatically builds all BASC targets
 #
 set -e
-# Invoke sub build scripts
-sh ./seminar-scripts/autobuild-cross-compiler.sh
-sh ./seminar-scripts/autobuild-rootfs.sh
-sh ./seminar-scripts/autobuild-bootable-rootfs.sh
-# Add scripts
-for script in ./seminar-scripts/to-include-in-output/*; do
-  cp -f "$script" ./output
-done
-find ./output -maxdepth 1 -name '*.sh' -exec chmod +x {} \;
+# Build
+sh ./seminar-scripts/autobuild.sh 'arm-cross-compiler' 'sdk'
+sh ./seminar-scripts/autobuild.sh 'arm-cross-compiler-5.4' 'sdk'
+sh ./seminar-scripts/autobuild.sh 'arm-rootfs'
+sh ./seminar-scripts/autobuild.sh 'arm-rootfs-5.4'
+sh ./seminar-scripts/autobuild.sh 'arm-bootable-rootfs'
 # Package
 sh ./seminar-scripts/autobuild-package.sh

@@ -1,6 +1,6 @@
 output
 buildroot-*
-buildroot-*.tar.gz
+buildroot*.tar.*
 *-arm
 presentation/*
 !presentation/content.tex
