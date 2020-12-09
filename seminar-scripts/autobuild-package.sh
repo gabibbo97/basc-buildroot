@@ -5,7 +5,6 @@
 rm -f output/buildroot.tar
 tar \
   --create \
-  --sparse \
   --verbose \
   --directory=output \
   --file output/buildroot.tar ./bootable-rootfs ./cross-compiler ./rootfs \
