@@ -9,12 +9,12 @@ fail() {
 [ -x "$(command -v systemd-nspawn)" ] || fail "Please install system-nspawn"
 [ -x "$(command -v tar)" ] || fail "Please install tar"
 # Extract rootfs
-if ! [ -d rootfs/rootfs ]; then
+if ! [ -d arm-rootfs/rootfs ]; then
     echo 'Extracting rootfs'
-    mkdir rootfs/rootfs
-    tar -C rootfs/rootfs -xf rootfs/rootfs.tar
+    mkdir arm-rootfs/rootfs
+    tar -C arm-rootfs/rootfs -xf arm-rootfs/rootfs.tar
 fi
 # Copy qemu-arm-static
-cp -f "$(which qemu-arm-static)" rootfs/rootfs/bin/qemu-arm-static
+cp -f "$(which qemu-arm-static)" arm-rootfs/rootfs/bin/qemu-arm-static
 # Startup
-sudo systemd-nspawn --register=no -D ./rootfs/rootfs /bin/qemu-arm-static /bin/sh
+sudo systemd-nspawn --register=no -D ./arm-rootfs/rootfs /bin/qemu-arm-static /bin/sh
