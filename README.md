@@ -73,6 +73,29 @@ sudo apt-get install -y \
   qemu-system-arm
 ```
 
+#### For the bravest
+
+__Please perform these steps only if you know your way around fixing any issue that might arise__
+
+Ubuntu 20.04's default kernel (5.4) does not support all of the features we need for this seminar, namely:
+
+- QEMU user emulation in Docker
+- QEMU user emulation in systemd-nspawn
+
+This can be fixed by installing a more updated kernel that can be downloaded and installed with
+
+```sh
+# Download updated kernel images
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.9/amd64/linux-image-unsigned-5.9.0-050900-generic_5.9.0-050900.202010112230_amd64.deb
+wget https://kernel.ubuntu.com/~kernel-ppa/mainline/v5.9/amd64/linux-modules-5.9.0-050900-generic_5.9.0-050900.202010112230_amd64.deb
+# Install the packages
+sudo dpkg -i linux-*.deb
+# Reboot the system
+systemctl reboot
+```
+
+__If you're unsure DO NOT PERFORM THESE STEPS__
+
 ## Obtaining
 
 ```sh
